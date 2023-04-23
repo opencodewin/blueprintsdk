@@ -221,6 +221,7 @@ NodeRegistry::NodeRegistry()
         WindFusionNode::GetStaticTypeInfo(),
         WipeFusionNode::GetStaticTypeInfo(),
         RollsFusionNode::GetStaticTypeInfo(),
+        EdgeFusionNode::GetStaticTypeInfo(),
         // Media node
         MatCropNode::GetStaticTypeInfo(),
         MatWarpPerspectiveNode::GetStaticTypeInfo(),
