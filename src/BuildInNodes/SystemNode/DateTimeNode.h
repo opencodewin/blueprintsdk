@@ -7,20 +7,30 @@ struct DateTimeNode final : Node
     enum DATETIME_FLAGS : int32_t
     {
         DATETIME_STAMP      =      0,
-        DATETIME_YEAR       = 1 << 0,
-        DATETIME_MONTH      = 1 << 1,
-        DATETIME_YEAR_DAY   = 1 << 2,
-        DATETIME_MONTH_DAY  = 1 << 3,
-        DATETIME_WEEK_DAY   = 1 << 4,
-        DATETIME_HOUR       = 1 << 5,
-        DATETIME_MIN        = 1 << 6,
-        DATETIME_SEC        = 1 << 7,
-        DATETIME_MSEC       = 1 << 8,
-        DATETIME_USEC       = 1 << 9,
-        DATETIME_ZONE       = 1 << 10,
+        DATETIME_COUNT      = 1 << 0,
+        DATETIME_COUNT_FLOAT= 1 << 1,
+        DATETIME_YEAR       = 1 << 2,
+        DATETIME_MONTH      = 1 << 3,
+        DATETIME_YEAR_DAY   = 1 << 4,
+        DATETIME_MONTH_DAY  = 1 << 5,
+        DATETIME_WEEK_DAY   = 1 << 6,
+        DATETIME_HOUR       = 1 << 7,
+        DATETIME_MIN        = 1 << 8,
+        DATETIME_SEC        = 1 << 9,
+        DATETIME_MSEC       = 1 << 10,
+        DATETIME_USEC       = 1 << 11,
+        DATETIME_ZONE       = 1 << 12,
     };
     BP_NODE(DateTimeNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
     DateTimeNode(BP* blueprint): Node(blueprint) { m_Name = "Date Time"; }
+
+    void Reset(Context& context) override
+    {
+        Node::Reset(context);
+        context.SetPinValue(m_count, 0);
+        context.SetPinValue(m_count_float, 0);
+        m_start_time = ImGui::get_current_time_usec();
+    }
 
     FlowPin Execute(Context& context, FlowPin& entryPoint, bool threading = false) override
     {
@@ -42,6 +52,10 @@ struct DateTimeNode final : Node
         context.SetPinValue(m_mSec, (int32_t)msec);
         context.SetPinValue(m_uSec, (int32_t)usec);
         context.SetPinValue(m_TimeStamp, hi_time);
+
+        auto count_time = hi_time - m_start_time;
+        context.SetPinValue(m_count, (int32_t)count_time);
+        context.SetPinValue(m_count_float, (float)count_time / 1000000.f);
 #ifdef _WIN32
         context.SetPinValue(m_Zone, string("C"));
 #else
@@ -68,6 +82,8 @@ struct DateTimeNode final : Node
         bool flag_msec          = m_out_flags & DATETIME_MSEC;
         bool flag_usec          = m_out_flags & DATETIME_USEC;
         bool flag_zone          = m_out_flags & DATETIME_ZONE;
+        bool flag_count         = m_out_flags & DATETIME_COUNT;
+        bool flag_count_float   = m_out_flags & DATETIME_COUNT_FLOAT;
         ImGui::SetCurrentContext(ctx);
         ImGui::TextUnformatted("        Year"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_year", &flag_year);
         ImGui::TextUnformatted("       Month"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_month", &flag_month);
@@ -80,6 +96,8 @@ struct DateTimeNode final : Node
         ImGui::TextUnformatted(" MilliSecond"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_msec", &flag_msec);
         ImGui::TextUnformatted(" MicroSecond"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_usec", &flag_usec);
         ImGui::TextUnformatted("        Zone"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_zone", &flag_zone);
+        ImGui::TextUnformatted("       Count"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_count", &flag_count);
+        ImGui::TextUnformatted(" Count Float"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_count_float", &flag_count_float);
         m_out_flags = 0;
         if (flag_year)      m_out_flags |= DATETIME_YEAR;
         if (flag_month)     m_out_flags |= DATETIME_MONTH;
@@ -92,6 +110,8 @@ struct DateTimeNode final : Node
         if (flag_msec)      m_out_flags |= DATETIME_MSEC;
         if (flag_usec)      m_out_flags |= DATETIME_USEC;
         if (flag_zone)      m_out_flags |= DATETIME_ZONE;
+        if (flag_count)     m_out_flags |= DATETIME_COUNT;
+        if (flag_count_float)m_out_flags |= DATETIME_COUNT_FLOAT;
         BuildOutputPin();
     }
 
@@ -138,7 +158,8 @@ struct DateTimeNode final : Node
         if (m_out_flags & DATETIME_MSEC)        { m_OutputPins.push_back(&m_mSec); }
         if (m_out_flags & DATETIME_USEC)        { m_OutputPins.push_back(&m_uSec); }
         if (m_out_flags & DATETIME_ZONE)        { m_OutputPins.push_back(&m_Zone); }
-
+        if (m_out_flags & DATETIME_COUNT)       { m_OutputPins.push_back(&m_count); }
+        if (m_out_flags & DATETIME_COUNT_FLOAT) { m_OutputPins.push_back(&m_count_float); }
     }
 
     span<Pin*> GetInputPins() override { return m_InputPins; }
@@ -163,10 +184,12 @@ struct DateTimeNode final : Node
     Int32Pin m_mSec = { this, "Millisecone"};
     Int32Pin m_uSec = { this, "Microsecond"};
     StringPin m_Zone = { this, "Time Zone", ""};
-    
+    Int32Pin m_count = { this, "Count"};
+    FloatPin m_count_float = { this, "Count Float"};
     Pin* m_InputPins[1] = { &m_Enter };
     std::vector<Pin *> m_OutputPins;
 
     int32_t m_out_flags = 0;
+    int64_t m_start_time = 0;
 };
 } // namespace BluePrint
