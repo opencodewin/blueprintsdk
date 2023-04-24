@@ -47,7 +47,7 @@ struct StarlNode final : Node
             }
             m_device = gpu;
             ImGui::VkMat im_RGB; im_RGB.type = m_mat_data_type == IM_DT_UNDEFINED ? mat_in.type : m_mat_data_type;
-            m_NodeTimeMs = m_filter->filter(mat_in, im_RGB, m_time);
+            m_NodeTimeMs = m_filter->filter(mat_in, im_RGB, m_time, m_color);
             m_MatOut.SetValue(im_RGB);
         }
         return m_Exit;
@@ -82,6 +82,7 @@ struct StarlNode final : Node
         ImGui::SetCurrentContext(ctx);
         bool changed = false;
         float _time = m_time;
+        ImPixel _color = m_color;
         static ImGuiSliderFlags flags = ImGuiSliderFlags_NoInput;
         ImGui::Dummy(ImVec2(200, 8));
         ImGui::PushItemWidth(200);
@@ -91,6 +92,11 @@ struct StarlNode final : Node
         if (key) ImGui::ImCurveEditKey("##add_curve_time##Star", key, "time##Star", 0.0f, 100000.f, 1.f);
         ImGui::EndDisabled();
         ImGui::PopItemWidth();
+        if (ImGui::ColorEdit4("Color##Star", (float*)&_color, ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar))
+        {
+            m_color = _color; changed = true;
+        } ImGui::SameLine(); ImGui::TextUnformatted("Shadow Color");
+        ImGui::SameLine(320);  if (ImGui::Button(ICON_RESET "##reset_color##DStar")) { m_color = {1.0f, 0.1f, 0.9f, 1.0f}; changed = true; }
         if (_time != m_time) { m_time = _time; changed = true; }
         return m_Enabled ? changed : false;
     }
@@ -113,6 +119,15 @@ struct StarlNode final : Node
             if (val.is_number()) 
                 m_time = val.get<imgui_json::number>();
         }
+        if (value.contains("color"))
+        {
+            auto& val = value["color"];
+            if (val.is_vec4())
+            {
+                ImVec4 val4 = val.get<imgui_json::vec4>();
+                m_color = ImPixel(val4.x, val4.y, val4.z, val4.w);
+            }
+        }
         return ret;
     }
 
@@ -121,6 +136,7 @@ struct StarlNode final : Node
         Node::Save(value, MapID);
         value["mat_type"] = imgui_json::number(m_mat_data_type);
         value["time"] = imgui_json::number(m_time);
+        value["color"] = imgui_json::vec4(ImVec4(m_color.r, m_color.g, m_color.b, m_color.a));
     }
 
     void DrawNodeLogo(ImGuiContext * ctx, ImVec2 size) const override
@@ -133,7 +149,7 @@ struct StarlNode final : Node
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 #if IMGUI_ICONS
-        ImGui::Button((std::string(u8"\uf835") + "##" + std::to_string(m_ID)).c_str(), size);
+        ImGui::Button((std::string(u8"\ue3ea") + "##" + std::to_string(m_ID)).c_str(), size);
 #else
         ImGui::Button((std::string("F") + "##" + std::to_string(m_ID)).c_str(), size);
 #endif
@@ -161,6 +177,7 @@ private:
     ImDataType m_mat_data_type {IM_DT_UNDEFINED};
     int m_device            {-1};
     float m_time            {0.f};
+    ImPixel m_color         {1.0f, 0.1f, 0.9f, 1.0f};
     ImGui::Star_vulkan * m_filter   {nullptr};
 };
 } // namespace BluePrint
