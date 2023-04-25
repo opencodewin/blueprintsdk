@@ -6,14 +6,14 @@
 
 namespace BluePrint
 {
-struct StarlNode final : Node
+struct StarEffectNode final : Node
 {
-    BP_NODE_WITH_NAME(StarlNode, "Star Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
-    StarlNode(BP* blueprint): Node(blueprint) { m_Name = "Star Effect"; }
+    BP_NODE_WITH_NAME(StarEffectNode, "Star Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
+    StarEffectNode(BP* blueprint): Node(blueprint) { m_Name = "Star Effect"; }
 
-    ~StarlNode()
+    ~StarEffectNode()
     {
-        if (m_filter) { delete m_filter; m_filter = nullptr; }
+        if (m_effect) { delete m_effect; m_effect = nullptr; }
     }
 
     void Reset(Context& context) override
@@ -36,18 +36,18 @@ struct StarlNode final : Node
                 m_MatOut.SetValue(mat_in);
                 return m_Exit;
             }
-            if (!m_filter || gpu != m_device)
+            if (!m_effect || gpu != m_device)
             {
-                if (m_filter) { delete m_filter; m_filter = nullptr; }
-                m_filter = new ImGui::Star_vulkan(gpu);
+                if (m_effect) { delete m_effect; m_effect = nullptr; }
+                m_effect = new ImGui::Star_vulkan(gpu);
             }
-            if (!m_filter)
+            if (!m_effect)
             {
                 return {};
             }
             m_device = gpu;
             ImGui::VkMat im_RGB; im_RGB.type = m_mat_data_type == IM_DT_UNDEFINED ? mat_in.type : m_mat_data_type;
-            m_NodeTimeMs = m_filter->filter(mat_in, im_RGB, m_time, m_color);
+            m_NodeTimeMs = m_effect->effect(mat_in, im_RGB, m_time, m_color);
             m_MatOut.SetValue(im_RGB);
         }
         return m_Exit;
@@ -89,7 +89,7 @@ struct StarlNode final : Node
         ImGui::BeginDisabled(!m_Enabled || m_TimeIn.IsLinked());
         ImGui::SliderFloat("Time##Star", &_time, 0.1, 8.f, "%.2f", flags);
         ImGui::SameLine(320);  if (ImGui::Button(ICON_RESET "##reset_time##Star")) { _time = 0.f; changed = true; }
-        if (key) ImGui::ImCurveEditKey("##add_curve_time##Star", key, "time##Star", 0.0f, 100000.f, 1.f);
+        if (key) ImGui::ImCurveEditKey("##add_curve_time##Star", key, "time##Star", 0.0f, 100.f, 1.f);
         ImGui::EndDisabled();
         ImGui::PopItemWidth();
         if (ImGui::ColorEdit4("Color##Star", (float*)&_color, ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar))
@@ -178,6 +178,6 @@ private:
     int m_device            {-1};
     float m_time            {0.f};
     ImPixel m_color         {1.0f, 0.1f, 0.9f, 1.0f};
-    ImGui::Star_vulkan * m_filter   {nullptr};
+    ImGui::Star_vulkan * m_effect   {nullptr};
 };
 } // namespace BluePrint
