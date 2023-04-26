@@ -2,16 +2,16 @@
 #include <imgui_json.h>
 #include <imgui_extra_widget.h>
 #include <ImVulkanShader.h>
-#include <Lighting_vulkan.h>
+#include <Sway_vulkan.h>
 
 namespace BluePrint
 {
-struct LightingEffectNode final : Node
+struct SwayEffectNode final : Node
 {
-    BP_NODE_WITH_NAME(LightingEffectNode, "Lighting Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
-    LightingEffectNode(BP* blueprint): Node(blueprint) { m_Name = "Lighting Effect"; }
+    BP_NODE_WITH_NAME(SwayEffectNode, "Sway Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
+    SwayEffectNode(BP* blueprint): Node(blueprint) { m_Name = "Sway Effect"; }
 
-    ~LightingEffectNode()
+    ~SwayEffectNode()
     {
         if (m_effect) { delete m_effect; m_effect = nullptr; }
     }
@@ -39,7 +39,7 @@ struct LightingEffectNode final : Node
             if (!m_effect || gpu != m_device)
             {
                 if (m_effect) { delete m_effect; m_effect = nullptr; }
-                m_effect = new ImGui::Lighting_vulkan(gpu);
+                m_effect = new ImGui::Sway_vulkan(gpu);
             }
             if (!m_effect)
             {
@@ -47,7 +47,7 @@ struct LightingEffectNode final : Node
             }
             m_device = gpu;
             ImGui::VkMat im_RGB; im_RGB.type = m_mat_data_type == IM_DT_UNDEFINED ? mat_in.type : m_mat_data_type;
-            m_NodeTimeMs = m_effect->effect(mat_in, im_RGB, m_time, m_saturation, m_light);
+            m_NodeTimeMs = m_effect->effect(mat_in, im_RGB, m_time, m_horizontal);
             m_MatOut.SetValue(im_RGB);
         }
         return m_Exit;
@@ -82,24 +82,17 @@ struct LightingEffectNode final : Node
         ImGui::SetCurrentContext(ctx);
         bool changed = false;
         float _time = m_time;
-        float _saturation = m_saturation;
-        float _light = m_light;
         static ImGuiSliderFlags flags = ImGuiSliderFlags_NoInput;
         ImGui::Dummy(ImVec2(200, 8));
         ImGui::PushItemWidth(200);
         ImGui::BeginDisabled(!m_Enabled || m_TimeIn.IsLinked());
-        ImGui::SliderFloat("Time##Lighting", &_time, 0.1, 8.f, "%.2f", flags);
-        ImGui::SameLine(320);  if (ImGui::Button(ICON_RESET "##reset_time##Lighting")) { _time = 0.f; changed = true; }
-        if (key) ImGui::ImCurveEditKey("##add_curve_time##Lighting", key, "time##Lighting", 0.0f, 100.f, 1.f);
+        ImGui::SliderFloat("Time##Sway", &_time, 0.1, 8.f, "%.2f", flags);
+        ImGui::SameLine(320);  if (ImGui::Button(ICON_RESET "##reset_time##Sway")) { _time = 0.f; changed = true; }
+        if (key) ImGui::ImCurveEditKey("##add_curve_time##Sway", key, "time##Sway", 0.0f, 100.f, 1.f);
         ImGui::EndDisabled();
-        ImGui::SliderFloat("Saturation##Lighting", &_saturation, 0.0, 1.f, "%.2f", flags);
-        ImGui::SameLine(320);  if (ImGui::Button(ICON_RESET "##reset_saturation##Lighting")) { _saturation = 0.3f; changed = true; }
-        ImGui::SliderFloat("Lighting##Lighting", &_light, 0.0, 1.f, "%.2f", flags);
-        ImGui::SameLine(320);  if (ImGui::Button(ICON_RESET "##reset_light##Lighting")) { _light = 0.3f; changed = true; }
+        if (ImGui::Checkbox("Horizontal##Sway", &m_horizontal)) { changed = true; }
         ImGui::PopItemWidth();
         if (_time != m_time) { m_time = _time; changed = true; }
-        if (_saturation != m_saturation) { m_saturation = _saturation; changed = true; }
-        if (_light != m_light) { m_light = _light; changed = true; }
         return m_Enabled ? changed : false;
     }
 
@@ -121,17 +114,11 @@ struct LightingEffectNode final : Node
             if (val.is_number()) 
                 m_time = val.get<imgui_json::number>();
         }
-        if (value.contains("saturation"))
+        if (value.contains("horizontal"))
         {
-            auto& val = value["saturation"];
-            if (val.is_number()) 
-                m_saturation = val.get<imgui_json::number>();
-        }
-        if (value.contains("light"))
-        {
-            auto& val = value["light"];
-            if (val.is_number()) 
-                m_light = val.get<imgui_json::number>();
+            auto& val = value["horizontal"];
+            if (val.is_boolean()) 
+                m_horizontal = val.get<imgui_json::boolean>();
         }
         return ret;
     }
@@ -141,8 +128,7 @@ struct LightingEffectNode final : Node
         Node::Save(value, MapID);
         value["mat_type"] = imgui_json::number(m_mat_data_type);
         value["time"] = imgui_json::number(m_time);
-        value["saturation"] = imgui_json::number(m_saturation);
-        value["light"] = imgui_json::number(m_light);
+        value["horizontal"] = imgui_json::boolean(m_horizontal);
     }
 
     void DrawNodeLogo(ImGuiContext * ctx, ImVec2 size) const override
@@ -155,7 +141,7 @@ struct LightingEffectNode final : Node
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 #if IMGUI_ICONS
-        ImGui::Button((std::string(u8"\ue3e4") + "##" + std::to_string(m_ID)).c_str(), size);
+        ImGui::Button((std::string(u8"\ue176") + "##" + std::to_string(m_ID)).c_str(), size);
 #else
         ImGui::Button((std::string("F") + "##" + std::to_string(m_ID)).c_str(), size);
 #endif
@@ -183,8 +169,7 @@ private:
     ImDataType m_mat_data_type {IM_DT_UNDEFINED};
     int m_device            {-1};
     float m_time            {0.f};
-    float m_saturation      {0.3f};
-    float m_light           {0.f};
-    ImGui::Lighting_vulkan * m_effect   {nullptr};
+    bool m_horizontal       {true};
+    ImGui::Sway_vulkan * m_effect   {nullptr};
 };
 } // namespace BluePrint

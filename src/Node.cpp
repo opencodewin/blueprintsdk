@@ -160,8 +160,9 @@ NodeRegistry::NodeRegistry()
         VibranceNode::GetStaticTypeInfo(),
         GuidedNode::GetStaticTypeInfo(),
         // effect nodes
-        StarEffectNode::GetStaticTypeInfo(),
         LightingEffectNode::GetStaticTypeInfo(),
+        StarEffectNode::GetStaticTypeInfo(),
+        SwayEffectNode::GetStaticTypeInfo(),
         // fusion nodes
         AlphaFusionNode::GetStaticTypeInfo(),
         BlurFusionNode::GetStaticTypeInfo(),
