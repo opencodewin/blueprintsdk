@@ -4,7 +4,7 @@ namespace BluePrint
 {
 struct SystemExitPointNode final : Node
 {
-    BP_NODE(SystemExitPointNode, VERSION_BLUEPRINT, NodeType::ExitPoint, NodeStyle::Simple, "System")
+    BP_NODE(SystemExitPointNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::ExitPoint, NodeStyle::Simple, "System")
 
     SystemExitPointNode(BP* blueprint): Node(blueprint) { m_Name = "End"; }
 

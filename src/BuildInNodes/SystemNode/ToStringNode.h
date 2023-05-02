@@ -7,7 +7,7 @@ struct ToStringNode final : Node
 #define FORMAT_TYPE_NONE        0
 #define FORMAT_TYPE_HEX         1
 #define FORMAT_TYPE_UNSIGNED    2
-    BP_NODE(ToStringNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(ToStringNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     ToStringNode(BP* blueprint): Node(blueprint)
     {

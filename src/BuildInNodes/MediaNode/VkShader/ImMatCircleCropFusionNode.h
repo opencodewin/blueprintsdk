@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct CircleCropFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(CircleCropFusionNode, "CircleCrop Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(CircleCropFusionNode, "CircleCrop Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     CircleCropFusionNode(BP* blueprint): Node(blueprint) { m_Name = "CircleCrop Transform"; }
 
     ~CircleCropFusionNode()

@@ -21,7 +21,7 @@ struct DateTimeNode final : Node
         DATETIME_USEC       = 1 << 11,
         DATETIME_ZONE       = 1 << 12,
     };
-    BP_NODE(DateTimeNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(DateTimeNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
     DateTimeNode(BP* blueprint): Node(blueprint) { m_Name = "Date Time"; }
 
     void Reset(Context& context) override

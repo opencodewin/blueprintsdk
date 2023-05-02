@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct PerlinFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(PerlinFusionNode, "Perlin Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(PerlinFusionNode, "Perlin Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     PerlinFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Perlin Transform"; }
 
     ~PerlinFusionNode()

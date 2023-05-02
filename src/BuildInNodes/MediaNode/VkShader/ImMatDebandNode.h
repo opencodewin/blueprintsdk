@@ -7,7 +7,7 @@ namespace BluePrint
 {
 struct DeBandNode final : Node
 {
-    BP_NODE_WITH_NAME(DeBandNode, "Deband", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Enhance")
+    BP_NODE_WITH_NAME(DeBandNode, "Deband", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Enhance")
     DeBandNode(BP* blueprint): Node(blueprint) { m_Name = "DeBand"; }
     ~DeBandNode()
     {

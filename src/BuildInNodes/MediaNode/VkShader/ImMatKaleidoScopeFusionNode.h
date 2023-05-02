@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct KaleidoScopeFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(KaleidoScopeFusionNode, "KaleidoScope Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(KaleidoScopeFusionNode, "KaleidoScope Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     KaleidoScopeFusionNode(BP* blueprint): Node(blueprint) { m_Name = "KaleidoScope Transform"; }
 
     ~KaleidoScopeFusionNode()

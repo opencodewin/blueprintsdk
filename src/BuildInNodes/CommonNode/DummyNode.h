@@ -4,7 +4,7 @@ namespace BluePrint
 {
 struct DummyNode final : Node
 {
-    BP_NODE(DummyNode, VERSION_BLUEPRINT, NodeType::Dummy, NodeStyle::Dummy, "Dummy")
+    BP_NODE(DummyNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Dummy, NodeStyle::Dummy, "Dummy")
     DummyNode(BP* blueprint): Node(blueprint) { m_Name = "Dummy"; }
     ~DummyNode()
     {

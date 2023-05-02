@@ -5,7 +5,7 @@ namespace BluePrint
 {
 struct ConstValueNode final : Node
 {
-    BP_NODE(ConstValueNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(ConstValueNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     ConstValueNode(BP* blueprint): Node(blueprint) 
     {

@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct WaterDropFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(WaterDropFusionNode, "WaterDrop Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(WaterDropFusionNode, "WaterDrop Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     WaterDropFusionNode(BP* blueprint): Node(blueprint) { m_Name = "WaterDrop Transform"; }
 
     ~WaterDropFusionNode()

@@ -9,7 +9,7 @@ namespace BluePrint
 {
 struct CompareNode final : Node
 {
-    BP_NODE(CompareNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
+    BP_NODE(CompareNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
     CompareNode(BP* blueprint): Node(blueprint) { SetType(PinType::Any); }
 
     PinValue EvaluatePin(const Context& context, const Pin& pin, bool threading = false) const override

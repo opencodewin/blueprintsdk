@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct DirectionalScaledFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(DirectionalScaledFusionNode, "DirectionalScaled Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(DirectionalScaledFusionNode, "DirectionalScaled Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     DirectionalScaledFusionNode(BP* blueprint): Node(blueprint) { m_Name = "DirectionalScaled Transform"; }
 
     ~DirectionalScaledFusionNode()

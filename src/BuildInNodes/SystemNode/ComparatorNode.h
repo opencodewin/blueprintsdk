@@ -15,7 +15,7 @@ namespace BluePrint
 {
 struct ComparatorNode final : Node
 {
-    BP_NODE(ComparatorNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(ComparatorNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     ComparatorNode(BP* blueprint): Node(blueprint) { m_Name = "Comparator"; }
 

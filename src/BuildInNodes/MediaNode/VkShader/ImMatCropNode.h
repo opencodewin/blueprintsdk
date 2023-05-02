@@ -10,7 +10,7 @@ namespace BluePrint
 {
 struct MatCropNode final : Node
 {
-    BP_NODE_WITH_NAME(MatCropNode, "Mat Crop", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Media")
+    BP_NODE_WITH_NAME(MatCropNode, "Mat Crop", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Media")
     MatCropNode(BP* blueprint): Node(blueprint) { m_Name = "Mat Crop"; }
 
     ~MatCropNode()

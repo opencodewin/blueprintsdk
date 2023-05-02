@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct PinwheelFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(PinwheelFusionNode, "Pinwheel Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(PinwheelFusionNode, "Pinwheel Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     PinwheelFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Pinwheel Transform"; }
 
     ~PinwheelFusionNode()

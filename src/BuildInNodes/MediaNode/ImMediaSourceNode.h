@@ -214,7 +214,7 @@ struct MediaSourceNode final : Node
 #endif
     };
 
-    BP_NODE_WITH_NAME(MediaSourceNode, "Media Source", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Media")
+    BP_NODE_WITH_NAME(MediaSourceNode, "Media Source", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Media")
     MediaSourceNode(BP* blueprint): Node(blueprint)
     {
         m_Name = "Media Source";

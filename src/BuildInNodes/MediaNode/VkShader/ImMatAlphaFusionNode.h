@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct AlphaFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(AlphaFusionNode, "Alpha Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
+    BP_NODE_WITH_NAME(AlphaFusionNode, "Alpha Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
     AlphaFusionNode(BP* blueprint): Node(blueprint)  { m_Name = "Alpha Transform"; }
 
     ~AlphaFusionNode()

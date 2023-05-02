@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct WindowSliceFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(WindowSliceFusionNode, "WindowSlice Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(WindowSliceFusionNode, "WindowSlice Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     WindowSliceFusionNode(BP* blueprint): Node(blueprint) { m_Name = "WindowSlice Transform"; }
 
     ~WindowSliceFusionNode()

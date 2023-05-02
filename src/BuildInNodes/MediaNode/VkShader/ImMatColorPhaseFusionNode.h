@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct ColorPhaseFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(ColorPhaseFusionNode, "ColorPhase Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Color")
+    BP_NODE_WITH_NAME(ColorPhaseFusionNode, "ColorPhase Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Color")
     ColorPhaseFusionNode(BP* blueprint): Node(blueprint) { m_Name = "ColorPhase Transform"; }
 
     ~ColorPhaseFusionNode()

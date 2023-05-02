@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct CrossZoomFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(CrossZoomFusionNode, "CrossZoom Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(CrossZoomFusionNode, "CrossZoom Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     CrossZoomFusionNode(BP* blueprint): Node(blueprint) { m_Name = "CrossZoom Transform"; }
 
     ~CrossZoomFusionNode()

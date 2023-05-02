@@ -9,7 +9,7 @@ namespace BluePrint
 {
 struct MulNode final : Node
 {
-    BP_NODE(MulNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
+    BP_NODE(MulNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
 
     MulNode(BP* blueprint): Node(blueprint)
     {

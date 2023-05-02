@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct StarEffectNode final : Node
 {
-    BP_NODE_WITH_NAME(StarEffectNode, "Star Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
+    BP_NODE_WITH_NAME(StarEffectNode, "Star Effect", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
     StarEffectNode(BP* blueprint): Node(blueprint) { m_Name = "Star Effect"; }
 
     ~StarEffectNode()

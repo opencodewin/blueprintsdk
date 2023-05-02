@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct PixelizeFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(PixelizeFusionNode, "Pixelize Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
+    BP_NODE_WITH_NAME(PixelizeFusionNode, "Pixelize Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
     PixelizeFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Pixelize Transform"; }
 
     ~PixelizeFusionNode()

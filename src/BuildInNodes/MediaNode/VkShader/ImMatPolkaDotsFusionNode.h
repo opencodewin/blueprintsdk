@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct PolkaDotsFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(PolkaDotsFusionNode, "PolkaDots Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(PolkaDotsFusionNode, "PolkaDots Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     PolkaDotsFusionNode(BP* blueprint): Node(blueprint) { m_Name = "PolkaDots Transform"; }
 
     ~PolkaDotsFusionNode()

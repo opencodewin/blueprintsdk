@@ -394,12 +394,13 @@ private:
 # define VERSION_PATCH(v)   ((v&0x0000FF00)>>8)
 # define VERSION_BUILT(v)   (v&0x000000FF)
 # define VERSION_BLUEPRINT  ((IMGUI_BP_SDK_VERSION_MAJOR << 24) | (IMGUI_BP_SDK_VERSION_MINOR << 16) | (IMGUI_BP_SDK_VERSION_PATCH << 8) | IMGUI_BP_SDK_VERSION_BUILD)
+# define VERSION_BLUEPRINT_API ((IMGUI_BP_SDK_API_VERSION_MAJOR << 24) | (IMGUI_BP_SDK_API_VERSION_MINOR << 16) | (IMGUI_BP_SDK_API_VERSION_PATCH << 8))
 namespace BluePrint
 {
 IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
 } // namespace BluePrint
 
-# define BP_NODE(type, node_version, node_type, node_style, node_catalog) \
+# define BP_NODE(type, node_version, api_version, node_type, node_style, node_catalog) \
     static ::BluePrint::NodeTypeInfo GetStaticTypeInfo() \
     { \
         return \
@@ -410,6 +411,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
             "CodeWin", \
             node_version, \
             VERSION_BLUEPRINT, \
+            api_version, \
             node_type, \
             node_style, \
             node_catalog, \
@@ -422,7 +424,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
         return GetStaticTypeInfo(); \
     }
 
-# define BP_NODE_WITH_NAME(type, name, node_version, node_type, node_style, node_catalog) \
+# define BP_NODE_WITH_NAME(type, name, author, node_version, api_version, node_type, node_style, node_catalog) \
     static ::BluePrint::NodeTypeInfo GetStaticTypeInfo() \
     { \
         return \
@@ -430,9 +432,10 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
             fnv1a_hash_32(#type + string("*") + node_catalog), \
             #type, \
             name, \
-            "CodeWin", \
+            author, \
             node_version, \
             VERSION_BLUEPRINT, \
+            api_version, \
             node_type, \
             node_style, \
             node_catalog, \
@@ -451,9 +454,12 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
 #define EXPORT
 #endif
 
-# define BP_NODE_DYNAMIC(type, author, node_version, node_type, node_style, node_catalog) \
+# define BP_NODE_DYNAMIC(type, author, node_version, api_version, node_type, node_style, node_catalog) \
     extern "C" EXPORT int32_t version() { \
         return VERSION_BLUEPRINT; \
+    } \
+    extern "C" EXPORT int32_t api_version() { \
+        return VERSION_BLUEPRINT_API; \
     } \
     \
     extern "C" EXPORT BluePrint::NodeTypeInfo* create(BluePrint::BP* blueprint) { \
@@ -462,9 +468,10 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
             BluePrint::fnv1a_hash_32(#type + string("*") + node_catalog), \
             #type, \
             #type, \
-            #author, \
+            author, \
             node_version, \
             VERSION_BLUEPRINT, \
+            api_version, \
             node_type, \
             node_style, \
             node_catalog, \
@@ -475,4 +482,32 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
     extern "C" EXPORT void destroy(BluePrint::NodeTypeInfo* pObj) { \
         delete pObj; \
     }
-    
+
+# define BP_NODE_DYNAMIC_WITH_NAME(type, name, author, node_version, api_version, node_type, node_style, node_catalog) \
+    extern "C" EXPORT int32_t version() { \
+        return VERSION_BLUEPRINT; \
+    } \
+    extern "C" EXPORT int32_t api_version() { \
+        return VERSION_BLUEPRINT_API; \
+    } \
+    \
+    extern "C" EXPORT BluePrint::NodeTypeInfo* create(BluePrint::BP* blueprint) { \
+        return new BluePrint::NodeTypeInfo\
+        ( \
+            BluePrint::fnv1a_hash_32(#type + string("*") + node_catalog), \
+            #type, \
+            name, \
+            author, \
+            node_version, \
+            VERSION_BLUEPRINT, \
+            api_version, \
+            node_type, \
+            node_style, \
+            node_catalog, \
+            [](::BluePrint::BP* blueprint) -> ::BluePrint::Node* { return new BluePrint::type(blueprint); } \
+        ); \
+    } \
+    \
+    extern "C" EXPORT void destroy(BluePrint::NodeTypeInfo* pObj) { \
+        delete pObj; \
+    }

@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct PolarFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(PolarFusionNode, "Polar Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(PolarFusionNode, "Polar Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     PolarFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Polar Transform"; }
 
     ~PolarFusionNode()

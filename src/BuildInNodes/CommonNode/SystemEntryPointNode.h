@@ -4,7 +4,7 @@ namespace BluePrint
 {
 struct SystemEntryPointNode final : Node
 {
-    BP_NODE(SystemEntryPointNode, VERSION_BLUEPRINT, NodeType::EntryPoint, NodeStyle::Simple, "System")
+    BP_NODE(SystemEntryPointNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::EntryPoint, NodeStyle::Simple, "System")
 
     SystemEntryPointNode(BP* blueprint): Node(blueprint) { m_Name = "Start"; }
 

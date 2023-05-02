@@ -4,7 +4,7 @@ namespace BluePrint
 {
 struct FusionEntryPointNode final : Node
 {
-    BP_NODE(FusionEntryPointNode, VERSION_BLUEPRINT, NodeType::EntryPoint, NodeStyle::Simple, "System")
+    BP_NODE(FusionEntryPointNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::EntryPoint, NodeStyle::Simple, "System")
 
     FusionEntryPointNode(BP* blueprint): Node(blueprint) 
     {

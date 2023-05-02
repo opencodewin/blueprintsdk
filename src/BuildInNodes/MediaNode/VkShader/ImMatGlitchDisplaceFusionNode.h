@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct GlitchDisplaceFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(GlitchDisplaceFusionNode, "GlitchDisplace Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(GlitchDisplaceFusionNode, "GlitchDisplace Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     GlitchDisplaceFusionNode(BP* blueprint): Node(blueprint) { m_Name = "GlitchDisplace Transform"; }
 
     ~GlitchDisplaceFusionNode()

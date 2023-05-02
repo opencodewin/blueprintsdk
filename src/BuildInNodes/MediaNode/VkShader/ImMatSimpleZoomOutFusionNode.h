@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct SimpleZoomOutFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(SimpleZoomOutFusionNode, "SimpleZoomOut Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(SimpleZoomOutFusionNode, "SimpleZoomOut Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     SimpleZoomOutFusionNode(BP* blueprint): Node(blueprint) { m_Name = "SimpleZoomOut Transform"; }
 
     ~SimpleZoomOutFusionNode()

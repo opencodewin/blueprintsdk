@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct FlipNode final : Node
 {
-    BP_NODE_WITH_NAME(FlipNode, "Flip", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Flip")
+    BP_NODE_WITH_NAME(FlipNode, "Flip", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Flip")
     FlipNode(BP* blueprint): Node(blueprint) { m_Name = "Flip"; }
 
     ~FlipNode()

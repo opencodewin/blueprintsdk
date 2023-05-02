@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct FlyeyeFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(FlyeyeFusionNode, "Flyeye Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(FlyeyeFusionNode, "Flyeye Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     FlyeyeFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Flyeye Transform"; }
 
     ~FlyeyeFusionNode()

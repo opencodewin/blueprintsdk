@@ -7,7 +7,7 @@ namespace BluePrint
 {
 struct AlmNode final : Node
 {
-    BP_NODE_WITH_NAME(AlmNode, "ALM Enhancement", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Enhance")
+    BP_NODE_WITH_NAME(AlmNode, "ALM Enhancement", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Enhance")
     AlmNode(BP* blueprint): Node(blueprint) { m_Name = "ALM Enhancement"; }
     ~AlmNode()
     {
@@ -196,3 +196,5 @@ private:
     ImGui::ALM_vulkan * m_filter {nullptr};
 };
 } //namespace BluePrint
+
+//BP_NODE_DYNAMIC_WITH_NAME(AlmNode, "ALM Enhancement", "CodeWin", NODE_VERSION, BluePrint::NodeType::External, BluePrint::NodeStyle::Default, "Filter#Video#Enhance")

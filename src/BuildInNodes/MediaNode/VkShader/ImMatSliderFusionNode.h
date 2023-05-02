@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct SliderFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(SliderFusionNode, "Slider Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(SliderFusionNode, "Slider Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     SliderFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Slider Transform"; }
 
     ~SliderFusionNode()

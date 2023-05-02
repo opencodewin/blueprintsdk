@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct CrosshatchFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(CrosshatchFusionNode, "Crosshatch Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(CrosshatchFusionNode, "Crosshatch Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     CrosshatchFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Crosshatch Transform"; }
 
     ~CrosshatchFusionNode()

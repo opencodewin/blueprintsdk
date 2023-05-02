@@ -9,7 +9,7 @@ namespace BluePrint
 {
 struct SwitchNode final : Node
 {
-    BP_NODE(SwitchNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
+    BP_NODE(SwitchNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
 
     SwitchNode(BP* blueprint) : Node(blueprint) { SetType(PinType::Any); }
 

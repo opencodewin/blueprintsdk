@@ -9,7 +9,7 @@ namespace BluePrint
 {
 struct DivNode final : Node
 {
-    BP_NODE(DivNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
+    BP_NODE(DivNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
 
     DivNode(BP* blueprint): Node(blueprint)
     {

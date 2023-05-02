@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct LightingEffectNode final : Node
 {
-    BP_NODE_WITH_NAME(LightingEffectNode, "Lighting Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
+    BP_NODE_WITH_NAME(LightingEffectNode, "Lighting Effect", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
     LightingEffectNode(BP* blueprint): Node(blueprint) { m_Name = "Lighting Effect"; }
 
     ~LightingEffectNode()

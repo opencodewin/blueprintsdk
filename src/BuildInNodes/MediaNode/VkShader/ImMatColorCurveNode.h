@@ -10,7 +10,7 @@ namespace BluePrint
 {
 struct ColorCurveNode final : Node
 {
-    BP_NODE_WITH_NAME(ColorCurveNode, "Color Curve", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
+    BP_NODE_WITH_NAME(ColorCurveNode, "Color Curve", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
     ColorCurveNode(BP* blueprint): Node(blueprint)
     {
         m_Name = "Color Curve";

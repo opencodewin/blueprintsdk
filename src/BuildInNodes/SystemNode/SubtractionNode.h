@@ -9,7 +9,7 @@ namespace BluePrint
 {
 struct SubNode final : Node
 {
-    BP_NODE(SubNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
+    BP_NODE(SubNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
 
     SubNode(BP* blueprint): Node(blueprint)
     {

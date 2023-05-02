@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct ButterflyWaveFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(ButterflyWaveFusionNode, "ButterflyWave Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(ButterflyWaveFusionNode, "ButterflyWave Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     ButterflyWaveFusionNode(BP* blueprint): Node(blueprint) { m_Name = "ButterflyWave Transform"; }
 
     ~ButterflyWaveFusionNode()

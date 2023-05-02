@@ -5,7 +5,7 @@ namespace BluePrint
 {
 struct BranchNode final : Node
 {
-    BP_NODE(BranchNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(BranchNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     BranchNode(BP* blueprint): Node(blueprint) { m_Name = "Branch"; }
 

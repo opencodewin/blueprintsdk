@@ -6,7 +6,7 @@ namespace BluePrint
 {
 struct FloatCountNode final : Node
 {
-    BP_NODE(FloatCountNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(FloatCountNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     FloatCountNode(BP* blueprint): Node(blueprint) { m_Name = "Float Count"; }
 

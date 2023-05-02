@@ -5,7 +5,7 @@ namespace BluePrint
 {
 struct FlipFlopNode final : Node
 {
-    BP_NODE(FlipFlopNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(FlipFlopNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     FlipFlopNode(BP* blueprint): Node(blueprint) { m_Name = "Flip Flop"; }
 

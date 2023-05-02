@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct HueNode final : Node
 {
-    BP_NODE_WITH_NAME(HueNode, "Hue", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
+    BP_NODE_WITH_NAME(HueNode, "Hue", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
     HueNode(BP* blueprint): Node(blueprint) { m_Name = "Hue"; }
 
     ~HueNode()

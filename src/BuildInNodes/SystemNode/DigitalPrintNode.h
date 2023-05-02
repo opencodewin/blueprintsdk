@@ -32,7 +32,7 @@ struct PrintNode final : Node
 {
     using PrintFunction = void(*)(const PrintNode& node, std::string message);
 
-    BP_NODE(PrintNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Debug")
+    BP_NODE(PrintNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Debug")
 
     PrintNode(BP* blueprint): Node(blueprint) { m_Name = "Print"; }
 

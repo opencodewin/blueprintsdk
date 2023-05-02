@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct RotateScaleVanishFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(RotateScaleVanishFusionNode, "RotateScaleVanish Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(RotateScaleVanishFusionNode, "RotateScaleVanish Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     RotateScaleVanishFusionNode(BP* blueprint): Node(blueprint) { m_Name = "RotateScaleVanish Transform"; }
 
     ~RotateScaleVanishFusionNode()

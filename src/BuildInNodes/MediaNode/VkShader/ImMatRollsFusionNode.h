@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct RollsFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(RollsFusionNode, "Rolls Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(RollsFusionNode, "Rolls Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     RollsFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Rolls Transform"; }
 
     ~RollsFusionNode()

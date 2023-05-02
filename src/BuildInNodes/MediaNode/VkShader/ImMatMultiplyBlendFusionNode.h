@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct MultiplyBlendFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(MultiplyBlendFusionNode, "MultiplyBlend Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Color")
+    BP_NODE_WITH_NAME(MultiplyBlendFusionNode, "MultiplyBlend Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Color")
     MultiplyBlendFusionNode(BP* blueprint): Node(blueprint) { m_Name = "MultiplyBlend Transform"; }
 
     ~MultiplyBlendFusionNode()

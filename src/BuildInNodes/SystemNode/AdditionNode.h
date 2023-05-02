@@ -9,7 +9,7 @@ namespace BluePrint
 {
 struct AddNode final : Node
 {
-    BP_NODE(AddNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
+    BP_NODE(AddNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Simple, "Arithmetic")
 
     AddNode(BP* blueprint) : Node(blueprint) { SetType(PinType::Any); }
 

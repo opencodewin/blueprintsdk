@@ -287,6 +287,8 @@ ID_TYPE NodeRegistry::RegisterNodeType(shared_ptr<NodeTypeInfo> info)
     typeInfo.m_Name             = info->m_Name;
     typeInfo.m_NodeTypeName     = info->m_NodeTypeName;
     typeInfo.m_Version          = info->m_Version;
+    typeInfo.m_SDK_Version      = info->m_SDK_Version;
+    typeInfo.m_API_Version      = info->m_API_Version;
     typeInfo.m_Type             = info->m_Type;
     typeInfo.m_Style            = info->m_Style;
     typeInfo.m_Catalog          = info->m_Catalog;
@@ -316,10 +318,18 @@ ID_TYPE NodeRegistry::RegisterNodeType(std::string Path, BP* blueprint)
     int32_t version = dlobject->get_version();
     if (version < VERSION_BLUEPRINT)
     {
-        LOGW("[RegisterNodeType] Warring Node BluePrint Version(%d.%d.%d.%d) less then App BluePrint Version(%d.%d.%d.%d)\n", 
+        LOGW("[RegisterNodeType] Warning Node BluePrint Version(%d.%d.%d.%d) less then App BluePrint Version(%d.%d.%d.%d)\n", 
                 VERSION_MAJOR(version), VERSION_MINOR(version), VERSION_PATCH(version), VERSION_BUILT(version),
                 VERSION_MAJOR(VERSION_BLUEPRINT), VERSION_MINOR(VERSION_BLUEPRINT), VERSION_PATCH(VERSION_BLUEPRINT), VERSION_BUILT(VERSION_BLUEPRINT));
     }
+    int32_t api_version = dlobject->get_api_version();
+    if (api_version < VERSION_BLUEPRINT_API)
+    {
+        LOGW("[RegisterNodeType] Warning Node BluePrint API Version(%d.%d.%d) less then App BluePrint API Version(%d.%d.%d)\n", 
+                VERSION_MAJOR(api_version), VERSION_MINOR(api_version), VERSION_PATCH(api_version),
+                VERSION_MAJOR(VERSION_BLUEPRINT_API), VERSION_MINOR(VERSION_BLUEPRINT_API), VERSION_PATCH(VERSION_BLUEPRINT_API));
+    }
+
     m_ExternalObject.push_back(dlobject);
     return RegisterNodeType(info);
 }
@@ -521,6 +531,11 @@ VERSION_TYPE Node::GetVersion() const
 VERSION_TYPE Node::GetSDKVersion() const
 {
     return GetTypeInfo().m_SDK_Version;
+}
+
+VERSION_TYPE Node::GetAPIVersion() const
+{
+    return GetTypeInfo().m_API_Version;
 }
 
 std::string Node::GetAuthor() const

@@ -6,7 +6,7 @@ namespace BluePrint
 {
 struct CountNode final : Node
 {
-    BP_NODE(CountNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(CountNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     CountNode(BP* blueprint): Node(blueprint) { m_Name = "Count"; }
 

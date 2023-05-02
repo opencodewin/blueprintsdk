@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct SwayEffectNode final : Node
 {
-    BP_NODE_WITH_NAME(SwayEffectNode, "Sway Effect", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
+    BP_NODE_WITH_NAME(SwayEffectNode, "Sway Effect", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Effect")
     SwayEffectNode(BP* blueprint): Node(blueprint) { m_Name = "Sway Effect"; }
 
     ~SwayEffectNode()

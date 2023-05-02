@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct FadeFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(FadeFusionNode, "Fade Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
+    BP_NODE_WITH_NAME(FadeFusionNode, "Fade Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
     FadeFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Fade Transform"; }
 
     ~FadeFusionNode()

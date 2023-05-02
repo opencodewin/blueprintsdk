@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct RadialFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(RadialFusionNode, "Radial Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(RadialFusionNode, "Radial Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     RadialFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Radial Transform"; }
 
     ~RadialFusionNode()

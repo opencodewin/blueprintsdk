@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct PageCurlFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(PageCurlFusionNode, "PageCurl Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(PageCurlFusionNode, "PageCurl Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     PageCurlFusionNode(BP* blueprint): Node(blueprint) { m_Name = "PageCurl Transform"; }
 
     ~PageCurlFusionNode()

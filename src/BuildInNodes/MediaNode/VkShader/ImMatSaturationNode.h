@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct SaturationNode final : Node
 {
-    BP_NODE_WITH_NAME(SaturationNode, "Saturation", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
+    BP_NODE_WITH_NAME(SaturationNode, "Saturation", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
     SaturationNode(BP* blueprint): Node(blueprint) { m_Name = "Saturation"; }
 
     ~SaturationNode()

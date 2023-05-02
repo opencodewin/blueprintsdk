@@ -24,7 +24,7 @@ namespace BluePrint
 {
 struct MatRenderNode final : Node
 {
-    BP_NODE_WITH_NAME(MatRenderNode, "Media Render", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Media")
+    BP_NODE_WITH_NAME(MatRenderNode, "Media Render", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Media")
     MatRenderNode(BP* blueprint): Node(blueprint) { m_Name = "Mat Render"; }
     ~MatRenderNode()
     {

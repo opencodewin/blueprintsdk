@@ -10,7 +10,7 @@ namespace BluePrint
 {
 struct ChromaKeyNode final : Node
 {
-    BP_NODE_WITH_NAME(ChromaKeyNode, "Chroma Key", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Matting")
+    BP_NODE_WITH_NAME(ChromaKeyNode, "Chroma Key", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Matting")
     ChromaKeyNode(BP* blueprint): Node(blueprint) { m_Name = "Chroma Key"; }
 
     ~ChromaKeyNode()

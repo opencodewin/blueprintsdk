@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct RippleFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(RippleFusionNode, "Ripple Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(RippleFusionNode, "Ripple Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     RippleFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Ripple Transform"; }
 
     ~RippleFusionNode()

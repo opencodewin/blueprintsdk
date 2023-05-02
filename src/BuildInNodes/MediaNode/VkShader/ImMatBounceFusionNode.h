@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct BounceFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(BounceFusionNode, "Bounce Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(BounceFusionNode, "Bounce Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     BounceFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Bounce Transform"; }
 
     ~BounceFusionNode()

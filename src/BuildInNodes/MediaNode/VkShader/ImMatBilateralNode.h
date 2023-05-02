@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct BilateralNode final : Node
 {
-    BP_NODE_WITH_NAME(BilateralNode, "Bilateral Blur", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Blur")
+    BP_NODE_WITH_NAME(BilateralNode, "Bilateral Blur", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Blur")
     BilateralNode(BP* blueprint): Node(blueprint) { m_Name = "Bilateral Blur"; }
 
     ~BilateralNode()

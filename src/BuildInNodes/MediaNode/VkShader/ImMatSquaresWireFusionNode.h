@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct SquaresWireFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(SquaresWireFusionNode, "SquaresWire Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
+    BP_NODE_WITH_NAME(SquaresWireFusionNode, "SquaresWire Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Shape")
     SquaresWireFusionNode(BP* blueprint): Node(blueprint) { m_Name = "SquaresWire Transform"; }
 
     ~SquaresWireFusionNode()

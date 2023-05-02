@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct WindFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(WindFusionNode, "Wind Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
+    BP_NODE_WITH_NAME(WindFusionNode, "Wind Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Move")
     WindFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Wind Transform"; }
 
     ~WindFusionNode()

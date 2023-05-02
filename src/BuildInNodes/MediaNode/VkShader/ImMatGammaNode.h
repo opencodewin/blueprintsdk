@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct GammaNode final : Node
 {
-    BP_NODE_WITH_NAME(GammaNode, "Gamma", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
+    BP_NODE_WITH_NAME(GammaNode, "Gamma", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
     GammaNode(BP* blueprint): Node(blueprint) { m_Name = "Gamma"; }
 
     ~GammaNode()

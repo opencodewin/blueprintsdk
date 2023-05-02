@@ -4,7 +4,7 @@ namespace BluePrint
 {
 struct LoopNode final : Node
 {
-    BP_NODE(LoopNode, VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Flow")
+    BP_NODE(LoopNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
     LoopNode(BP* blueprint): Node(blueprint) { m_Name = "Loop"; }
 

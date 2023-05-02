@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct ContrastNode final : Node
 {
-    BP_NODE_WITH_NAME(ContrastNode, "Contrast", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
+    BP_NODE_WITH_NAME(ContrastNode, "Contrast", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Filter#Video#Color")
     ContrastNode(BP* blueprint): Node(blueprint) { m_Name = "Contrast"; }
 
     ~ContrastNode()

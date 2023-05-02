@@ -8,7 +8,7 @@ namespace BluePrint
 {
 struct EdgeFusionNode final : Node
 {
-    BP_NODE_WITH_NAME(EdgeFusionNode, "Edge Transform", VERSION_BLUEPRINT, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
+    BP_NODE_WITH_NAME(EdgeFusionNode, "Edge Transform", "CodeWin", VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Fusion#Video#Mix")
     EdgeFusionNode(BP* blueprint): Node(blueprint) { m_Name = "Edge Transform"; }
 
     ~EdgeFusionNode()
