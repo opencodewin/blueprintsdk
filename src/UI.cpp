@@ -3604,7 +3604,7 @@ void BluePrintUI::ShowStyleEditor(bool* show)
     ImGui::RadioButton("HEX", &edit_mode, ImGuiColorEditFlags_DisplayHex);
     ImGui::EndHorizontal();
     static ImGuiTextFilter filter;
-    filter.Draw("", paneWidth);
+    filter.Draw("##filter", paneWidth);
     ImGui::Spacing();
     for (int i = 0; i < ed::StyleColor_Count; ++i)
     {

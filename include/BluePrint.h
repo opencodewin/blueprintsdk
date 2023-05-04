@@ -391,9 +391,9 @@ private:
 
 # define VERSION_MAJOR(v)   ((v & 0xFF000000) >> 24)
 # define VERSION_MINOR(v)   ((v & 0x00FF0000) >> 16)
-# define VERSION_PATCH(v)   ((v&0x0000FF00)>>8)
-# define VERSION_BUILT(v)   (v&0x000000FF)
-# define VERSION_BLUEPRINT  ((IMGUI_BP_SDK_VERSION_MAJOR << 24) | (IMGUI_BP_SDK_VERSION_MINOR << 16) | (IMGUI_BP_SDK_VERSION_PATCH << 8) | IMGUI_BP_SDK_VERSION_BUILD)
+# define VERSION_PATCH(v)   ((v & 0x0000FF00) >> 8)
+# define VERSION_BUILT(v)   ( v & 0x000000FF)
+# define VERSION_BLUEPRINT  ((IMGUI_BP_SDK_VERSION_MAJOR << 24) | (IMGUI_BP_SDK_VERSION_MINOR << 16) | (IMGUI_BP_SDK_VERSION_PATCH << 8))
 # define VERSION_BLUEPRINT_API ((IMGUI_BP_SDK_API_VERSION_MAJOR << 24) | (IMGUI_BP_SDK_API_VERSION_MINOR << 16) | (IMGUI_BP_SDK_API_VERSION_PATCH << 8))
 namespace BluePrint
 {
@@ -454,7 +454,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
 #define EXPORT
 #endif
 
-# define BP_NODE_DYNAMIC(type, author, node_version, api_version, node_type, node_style, node_catalog) \
+# define BP_NODE_DYNAMIC(type, author, node_version, _api_version, node_type, node_style, node_catalog) \
     extern "C" EXPORT int32_t version() { \
         return VERSION_BLUEPRINT; \
     } \
@@ -471,7 +471,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
             author, \
             node_version, \
             VERSION_BLUEPRINT, \
-            api_version, \
+            _api_version, \
             node_type, \
             node_style, \
             node_catalog, \
@@ -483,7 +483,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
         delete pObj; \
     }
 
-# define BP_NODE_DYNAMIC_WITH_NAME(type, name, author, node_version, api_version, node_type, node_style, node_catalog) \
+# define BP_NODE_DYNAMIC_WITH_NAME(type, name, author, node_version, _api_version, node_type, node_style, node_catalog) \
     extern "C" EXPORT int32_t version() { \
         return VERSION_BLUEPRINT; \
     } \
@@ -500,7 +500,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
             author, \
             node_version, \
             VERSION_BLUEPRINT, \
-            api_version, \
+            _api_version, \
             node_type, \
             node_style, \
             node_catalog, \

@@ -84,8 +84,9 @@ string NodeVersionToString(VERSION_TYPE version)
 {
     return  std::to_string(VERSION_MAJOR(version)) + "." +
             std::to_string(VERSION_MINOR(version)) + "." +
-            std::to_string(VERSION_PATCH(version)) + "." +
-            std::to_string(VERSION_BUILT(version));
+            std::to_string(VERSION_PATCH(version));
+            /* + "." +
+            std::to_string(VERSION_BUILT(version)); */
 }
 
 bool NodeVersionFromString(string str, VERSION_TYPE& version)
@@ -132,7 +133,6 @@ NodeRegistry::NodeRegistry()
         PrintNode::GetStaticTypeInfo(),
 #if IMGUI_VULKAN_SHADER
         // video filter nodes
-        AlmNode::GetStaticTypeInfo(),
         BilateralNode::GetStaticTypeInfo(),
         BrightnessNode::GetStaticTypeInfo(),
         BoxBlurNode::GetStaticTypeInfo(),
@@ -159,12 +159,7 @@ NodeRegistry::NodeRegistry()
         WhiteBalanceNode::GetStaticTypeInfo(),
         VibranceNode::GetStaticTypeInfo(),
         GuidedNode::GetStaticTypeInfo(),
-        // effect nodes
-        LightingEffectNode::GetStaticTypeInfo(),
-        StarEffectNode::GetStaticTypeInfo(),
-        SwayEffectNode::GetStaticTypeInfo(),
         // fusion nodes
-        AlphaFusionNode::GetStaticTypeInfo(),
         BlurFusionNode::GetStaticTypeInfo(),
         DoorFusionNode::GetStaticTypeInfo(),
         FadeFusionNode::GetStaticTypeInfo(),
