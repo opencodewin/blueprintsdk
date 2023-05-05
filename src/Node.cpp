@@ -160,12 +160,10 @@ NodeRegistry::NodeRegistry()
         VibranceNode::GetStaticTypeInfo(),
         GuidedNode::GetStaticTypeInfo(),
         // fusion nodes
-        BlurFusionNode::GetStaticTypeInfo(),
         DoorFusionNode::GetStaticTypeInfo(),
         FadeFusionNode::GetStaticTypeInfo(),
         MoveFusionNode::GetStaticTypeInfo(),
         SliderFusionNode::GetStaticTypeInfo(),
-        BookFlipFusionNode::GetStaticTypeInfo(),
         BounceFusionNode::GetStaticTypeInfo(),
         BowTieFusionNode::GetStaticTypeInfo(),
         ButterflyWaveFusionNode::GetStaticTypeInfo(),
