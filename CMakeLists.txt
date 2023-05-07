@@ -43,20 +43,7 @@ option(IMGUI_BP_SDK_STATIC              "Build BluePrint as static library" OFF)
 
 find_package(PkgConfig REQUIRED)
 
-if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-if(PKG_CONFIG_FOUND)
-    pkg_check_modules(
-        FFMPEG IMPORTED_TARGET
-        libavcodec
-        libavformat
-        libavutil
-        libswresample
-        libavfilter
-        libswscale
-        libavdevice
-    )
-endif(PKG_CONFIG_FOUND)
-else()
+if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 set(IMGUI_BP_SDK_STATIC ON CACHE BOOL "Enable Static Build by Force" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2  -s USE_GLFW=3 -s USE_WEBGPU=1 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=1 -s EXIT_RUNTIME=1 -s ASSERTIONS=1 -Wno-unused-command-line-argument")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_SDL=2  -s USE_GLFW=3 -s USE_WEBGPU=1 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=1 -s EXIT_RUNTIME=1 -s ASSERTIONS=1 -Wno-unused-command-line-argument")
@@ -96,18 +83,6 @@ set(IMGUI_BP_SDK_INC_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/BuildInNodes/MediaNode
     ${CMAKE_CURRENT_SOURCE_DIR}/src/BuildInNodes/MediaNode/VkShader
 )
-
-if (FFMPEG_FOUND)
-    add_compile_definitions(SDK_WITH_FFMPEG)
-    set(LINK_LIBS
-        ${LINK_LIBS}
-        PkgConfig::FFMPEG
-    )
-endif(FFMPEG_FOUND)
-
-if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    add_compile_definitions(SDK_WITH_SDL2)
-endif()
 
 # Generate all buildin node files into one header file
 message(STATUS "Generate Build In Nodes")

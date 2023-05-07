@@ -159,25 +159,11 @@ NodeRegistry::NodeRegistry()
         WhiteBalanceNode::GetStaticTypeInfo(),
         VibranceNode::GetStaticTypeInfo(),
         GuidedNode::GetStaticTypeInfo(),
-        // Media node
+        // Mat node
         MatCropNode::GetStaticTypeInfo(),
         MatWarpPerspectiveNode::GetStaticTypeInfo(),
         MatWarpAffineNode::GetStaticTypeInfo(),
 #endif
-#ifdef SDK_WITH_SDL2
-        // audio render node
-        SDLAudioRenderingNode::GetStaticTypeInfo(),
-#endif
-        // audio filter nodes
-        AudioGainNode::GetStaticTypeInfo(),
-        // audio fusion nodes
-        AudioFadeNode::GetStaticTypeInfo(),
-#ifdef SDK_WITH_FFMPEG
-        MediaSourceNode::GetStaticTypeInfo(),
-        AudioEqualizerNode::GetStaticTypeInfo(),
-#endif
-        // Media nodes
-        MatRenderNode::GetStaticTypeInfo(),
     })
 {
     RebuildTypes();
