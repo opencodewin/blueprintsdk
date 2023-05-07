@@ -131,39 +131,6 @@ NodeRegistry::NodeRegistry()
         BranchNode::GetStaticTypeInfo(),
         FlipFlopNode::GetStaticTypeInfo(),
         PrintNode::GetStaticTypeInfo(),
-#if IMGUI_VULKAN_SHADER
-        // video filter nodes
-        BilateralNode::GetStaticTypeInfo(),
-        BrightnessNode::GetStaticTypeInfo(),
-        BoxBlurNode::GetStaticTypeInfo(),
-        CannyNode::GetStaticTypeInfo(),
-        CasNode::GetStaticTypeInfo(),
-        ChromaKeyNode::GetStaticTypeInfo(),
-        ColorBalanceNode::GetStaticTypeInfo(),
-        ColorCurveNode::GetStaticTypeInfo(),
-        ColorInvertNode::GetStaticTypeInfo(),
-        ContrastNode::GetStaticTypeInfo(),
-        DeBandNode::GetStaticTypeInfo(),
-        DeinterlaceNode::GetStaticTypeInfo(),
-        ExposureNode::GetStaticTypeInfo(),
-        FlipNode::GetStaticTypeInfo(),
-        GammaNode::GetStaticTypeInfo(),
-        GaussianBlurNode::GetStaticTypeInfo(),
-        HQDN3DNode::GetStaticTypeInfo(),
-        HueNode::GetStaticTypeInfo(),
-        LaplacianNode::GetStaticTypeInfo(),
-        Lut3DNode::GetStaticTypeInfo(),
-        SaturationNode::GetStaticTypeInfo(),
-        SobelNode::GetStaticTypeInfo(),
-        USMNode::GetStaticTypeInfo(),
-        WhiteBalanceNode::GetStaticTypeInfo(),
-        VibranceNode::GetStaticTypeInfo(),
-        GuidedNode::GetStaticTypeInfo(),
-        // Mat node
-        MatCropNode::GetStaticTypeInfo(),
-        MatWarpPerspectiveNode::GetStaticTypeInfo(),
-        MatWarpAffineNode::GetStaticTypeInfo(),
-#endif
     })
 {
     RebuildTypes();
