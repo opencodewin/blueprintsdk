@@ -170,6 +170,7 @@ ID_TYPE NodeRegistry::RegisterNodeType(shared_ptr<NodeTypeInfo> info)
     typeInfo.m_Version          = info->m_Version;
     typeInfo.m_SDK_Version      = info->m_SDK_Version;
     typeInfo.m_API_Version      = info->m_API_Version;
+    typeInfo.m_Author           = info->m_Author;
     typeInfo.m_Type             = info->m_Type;
     typeInfo.m_Style            = info->m_Style;
     typeInfo.m_Catalog          = info->m_Catalog;

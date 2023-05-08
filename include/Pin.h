@@ -679,8 +679,8 @@ private:
 
 namespace BluePrint
 {
-    string PinTypeToString(PinType type);
-    bool PinTypeFromString(string str, PinType& type);
+    IMGUI_API string PinTypeToString(PinType type);
+    IMGUI_API bool PinTypeFromString(string str, PinType& type);
 } // namespace BluePrint
 
 struct PinExModuleInfo
