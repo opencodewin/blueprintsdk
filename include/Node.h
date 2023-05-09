@@ -94,6 +94,8 @@ struct NodeTypeInfo
     std::string     m_Catalog;
     Factory         m_Factory;
 
+    std::string     m_Url;
+
 	// for dynamic loading of the object
 	typedef int32_t version_t();
 	typedef NodeTypeInfo* create_t();
@@ -217,6 +219,7 @@ struct IMGUI_API Node
     virtual VERSION_TYPE    GetSDKVersion() const;
     virtual VERSION_TYPE    GetAPIVersion() const;
     virtual std::string     GetAuthor() const;
+    virtual std::string     GetURL() const;
     virtual ID_TYPE         GetTypeID() const;
     virtual NodeStyle       GetStyle() const;
     virtual std::string     GetCatalog() const;

@@ -175,6 +175,7 @@ ID_TYPE NodeRegistry::RegisterNodeType(shared_ptr<NodeTypeInfo> info)
     typeInfo.m_Style            = info->m_Style;
     typeInfo.m_Catalog          = info->m_Catalog;
     typeInfo.m_Factory          = info->m_Factory;
+    typeInfo.m_Url              = info->m_Url;
 
     m_CustomNodes.push_back(std::move(typeInfo));
 
@@ -213,6 +214,7 @@ ID_TYPE NodeRegistry::RegisterNodeType(std::string Path, BP* blueprint)
     }
 
     m_ExternalObject.push_back(dlobject);
+    info->m_Url = ImGuiHelper::path_url(Path);
     return RegisterNodeType(info);
 }
 
@@ -433,6 +435,14 @@ NodeStyle Node::GetStyle() const
 std::string Node::GetCatalog() const
 {
     return GetTypeInfo().m_Catalog;
+}
+
+std::string Node::GetURL() const
+{
+    ID_TYPE id = GetTypeInfo().m_ID;
+    auto nodeRegistry = m_Blueprint->GetNodeRegistry();
+    auto type_info = nodeRegistry->GetTypeInfo(id);
+    return type_info->m_Url;
 }
 
 void Node::SetName(std::string name)

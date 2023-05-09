@@ -462,7 +462,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
         return VERSION_BLUEPRINT_API; \
     } \
     \
-    extern "C" EXPORT BluePrint::NodeTypeInfo* create(BluePrint::BP* blueprint) { \
+    extern "C" EXPORT BluePrint::NodeTypeInfo* create() { \
         return new BluePrint::NodeTypeInfo\
         ( \
             BluePrint::fnv1a_hash_32(#type + string("*") + node_catalog), \
@@ -491,7 +491,7 @@ IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
         return VERSION_BLUEPRINT_API; \
     } \
     \
-    extern "C" EXPORT BluePrint::NodeTypeInfo* create(BluePrint::BP* blueprint) { \
+    extern "C" EXPORT BluePrint::NodeTypeInfo* create() { \
         return new BluePrint::NodeTypeInfo\
         ( \
             BluePrint::fnv1a_hash_32(#type + string("*") + node_catalog), \

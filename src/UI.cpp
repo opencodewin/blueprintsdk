@@ -1956,10 +1956,11 @@ void BluePrintUI::DrawInfoTooltip()
         auto nodeType = !isDummy ? hoveredNode->GetType() : ((DummyNode *)hoveredNode)->m_type;
         auto nodeStyle = !isDummy ? hoveredNode->GetStyle() : ((DummyNode *)hoveredNode)->m_style;
         auto nodeCatalog = !isDummy ? hoveredNode->GetCatalog() : ((DummyNode *)hoveredNode)->m_catalog;
-        auto nodeVersion = hoveredNode->GetVersion();
-        auto nodeSDKVersion = hoveredNode->GetSDKVersion();
-        auto nodeAPIVersion = hoveredNode->GetAPIVersion();
-        auto nodeAuthor = hoveredNode->GetAuthor();
+        auto nodeVersion = nodeTypeInfo.m_Version;
+        auto nodeSDKVersion = nodeTypeInfo.m_SDK_Version;
+        auto nodeAPIVersion = nodeTypeInfo.m_API_Version;
+        auto nodeAuthor = nodeTypeInfo.m_Author;
+        auto nodeURL = !isDummy ? (hoveredNode->GetURL().empty() ? "Internal" : hoveredNode->GetURL()) : "Missing"; // must call GetURL from regiested node type info list
         ed::Suspend();
         if (hoveredNode->m_IconHovered >= 0 && ImGui::BeginTooltip())
         {
@@ -2008,6 +2009,7 @@ void BluePrintUI::DrawInfoTooltip()
             ImGui::Bullet(); ImGui::TextUnformatted("APIVersion:"); ImGui::SameLine(); ImGui::Text("%" PRI_sv, FMT_sv(NodeVersionToString(nodeAPIVersion)));
             ImGui::Bullet(); ImGui::TextUnformatted("      Type:"); ImGui::SameLine(); ImGui::Text("%s", NodeTypeToString(nodeType).c_str());
             ImGui::Bullet(); ImGui::TextUnformatted("     Style:"); ImGui::SameLine(); ImGui::Text("%s", NodeStyleToString(nodeStyle).c_str());
+            ImGui::Bullet(); ImGui::TextUnformatted("       URL:"); ImGui::SameLine(); ImGui::Text("%" PRI_sv, FMT_sv(nodeURL));
             
             ImGui::Bullet(); ImGui::TextUnformatted("   Catalog:"); ImGui::SameLine();
             auto catalogs = BluePrint::GetCatalogInfo(nodeCatalog);
