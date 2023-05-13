@@ -2898,6 +2898,43 @@ bool BluePrintUI::Blueprint_IsValid()
     return true;
 }
 
+bool BluePrintUI::Blueprint_IsExecutable()
+{
+    if (!Blueprint_IsValid())
+        return false;
+
+    auto entryNode = FindEntryPointNode();
+    auto exitNode = FindExitPointNode();
+
+    bool linked = false;
+    // first check entry node links
+    auto entry_flow = entryNode->GetAutoLinkOutputFlowPin();
+    if (!entry_flow) return false;
+    if (!entry_flow->IsLinked()) return false;
+    auto entry_data = entryNode->GetAutoLinkOutputDataPin();
+    if (entry_data.empty()) return false;
+    for (auto entry_data_pin : entry_data)
+    {
+        if (entry_data_pin->IsLinked()) linked = true;
+    }
+    if (!linked) return false;
+
+    // then we check exit node links
+    linked = false;
+    auto exit_flow = exitNode->GetAutoLinkInputFlowPin();
+    if (!exit_flow) return false;
+    if (!exit_flow->IsLinked()) return false;
+    auto exit_data = exitNode->GetAutoLinkInputDataPin();
+    if (exit_data.empty()) return false;
+    for (auto exit_data_pin : exit_data)
+    {
+        if (exit_data_pin->IsLinked()) linked = true;
+    }
+    if (!linked) return false;
+
+    return true;
+}
+
 bool BluePrintUI::File_Open(std::string path, string* error)
 {
     if (File_IsOpen())
@@ -3631,6 +3668,7 @@ void BluePrintUI::ShowShortToolbar(bool vertical, bool* show)
         io.ConfigViewportsNoDecoration = true;
         ImGui::SetNextWindowViewport(viewport->ID);
     }
+    auto execable = Blueprint_IsExecutable();
     ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
     ImGui::PushStyleColor(ImGuiCol_Button, m_StyleColors[BluePrintStyleColor_ToolButton]);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, m_StyleColors[BluePrintStyleColor_ToolButtonHovered]);
@@ -3640,6 +3678,10 @@ void BluePrintUI::ShowShortToolbar(bool vertical, bool* show)
     ImGui::SetNextWindowPos(window_pos + ImVec2(vertical ? window_size.x - 48 : window_size.x - 432, 8));
     if (ImGui::Begin("##embedded_toolbar", show, window_flags))
     {
+        ImVec2 bar_window_pos = ImGui::GetWindowPos();
+        ImVec2 bar_window_size = ImGui::GetWindowSize();
+        if (!execable)
+            ImGui::GetWindowDrawList()->AddRectFilled(bar_window_pos, bar_window_pos + bar_window_size, IM_COL32(255, 0, 0, 128));
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             auto viewport = ImGui::GetWindowViewport();
@@ -3687,6 +3729,8 @@ void BluePrintUI::ShowShortToolbar(bool vertical, bool* show)
         string info_button_title = string(ICON_MD_INFO_OUTLINE) + "##info_tooltips";
         ImGui::CheckButton(info_button_title.c_str(), &m_isShowInfoTooltips, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
         ImGui::ShowTooltipOnHover("Show Info in tooltips");
+        //ImGui::SameLine();
+        //ImGui::Text("%s", Blueprint_IsExecutable() ? "R" : "X");
         // Show Thumbnails
         //if (!vertical) { ImGui::SameLine(); ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical); ImGui::SameLine(); }
         //else ImGui::SeparatorEx(ImGuiSeparatorFlags_Horizontal);
@@ -3820,6 +3864,8 @@ void BluePrintUI::ShowToolbar(bool* show)
         ImGui::SameLine();
         ImGui::Text("%.3fms/%.1fFPS", ImGui::GetIO().DeltaTime * 1000.f, ImGui::GetIO().Framerate);
         ImGui::SameLine();
+        //ImGui::Text("%s", Blueprint_IsExecutable() ? "R" : "X");
+        //ImGui::SameLine();
         ImGui::Dummy(ImVec2(20, 0));
     }
     ImGui::End();
