@@ -814,6 +814,7 @@ bool BluePrintUI::Frame(bool child_window, bool show_node, bool bp_enabled, uint
         m_isChildWindow = true;
         if (m_DebugOverlay) m_DebugOverlay->Enable(false);
         ed::SetCurrentEditor(m_Editor);
+        ed::EnableDragOverBorder(false);
         UpdateActions();
         ShowShortToolbar(flag & BluePrintFlag_Vertical);
         if (m_isShowThumbnails || m_ThumbnailShowCount > 0)
