@@ -1,5 +1,6 @@
 #include <application.h>
 #include <UI.h>
+#include <getopt.h>
 
 #define ENABLE_MULTI_VIEWPORT   1
 
@@ -41,7 +42,7 @@ static void BlueprintTest_Initialize(void** handle)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.IniFilename = ini_file.c_str();
     BluePrint::BluePrintUI * UI = new BluePrint::BluePrintUI();
-    UI->Initialize(bluepoint_file.c_str(), nullptr);
+    UI->Initialize(bluepoint_file.c_str());
     *handle = UI;
 #ifdef USE_THUMBNAILS
     ImGuiFileDialog::Instance()->SetCreateThumbnailCallback([](IGFD_Thumbnail_Info *vThumbnail_Info) -> void
@@ -92,6 +93,28 @@ static bool BlueprintTest_Frame(void * handle, bool app_will_quit)
 
 void Application_Setup(ApplicationWindowProperty& property)
 {
+    // param commandline args
+    std::vector<std::string> plugin_path;
+    static struct option long_options[] = {
+        { "plugin_dir", required_argument, NULL, 'p' },
+        { 0, 0, 0, 0 }
+    };
+    if (property.argc > 1 && property.argv)
+    {
+        int o = -1;
+        int option_index = 0;
+        while ((o = getopt_long(property.argc, property.argv, "p:", long_options, &option_index)) != -1)
+        {
+            if (o == -1)
+                break;
+            switch (o)
+            {
+                case 'p': plugin_path.push_back(std::string(optarg)); break;
+                default: break;
+            }
+        }
+    }
+
     property.name = "BlueprintSDK Test";
     property.docking = false;
     property.resizable = false;
@@ -101,4 +124,5 @@ void Application_Setup(ApplicationWindowProperty& property)
     property.application.Application_Initialize = BlueprintTest_Initialize;
     property.application.Application_Finalize = BlueprintTest_Finalize;
     property.application.Application_Frame = BlueprintTest_Frame;
+    BluePrint::BluePrintUI::LoadPlugins(plugin_path);
 }
