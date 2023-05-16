@@ -484,6 +484,59 @@ std::vector<Pin*> NodeCreateDialog::CreateLinkToFirstMatchingPin(Node& node, Pin
 
 namespace BluePrint
 {
+void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths)
+{
+    // load dynamic node
+    auto nodeRegistry = BP::GetNodeRegistry();
+    for (auto& plugin_path : pluginPaths)
+    {
+        std::vector<std::string> plugins, plugin_names;
+        std::vector<std::string> node_filter = {"node"};
+        std::vector<std::string> pin_filter = {"pin"};
+        if (DIR_Iterate(plugin_path, plugins, plugin_names, node_filter, false) == 0)
+        {
+            LOGI("Load Extra Node %s", plugin_real_path.c_str());
+            for (auto node_path : plugins)
+            {
+                auto nodetypeid = nodeRegistry->RegisterNodeType(node_path);
+                if (nodetypeid == 0)
+                {
+                    LOGE("Load Extra Node Failed %s", node_path.c_str());
+                    continue;
+                }
+                auto nodeinfo = nodeRegistry->GetTypeInfo(nodetypeid);
+                if (!nodeinfo)
+                {
+                    LOGE("Load Extra Node Failed %s", node_path.c_str());
+                    continue;
+                }
+                LOGI("Load Extra Node %s(%d.%d.%d.%d)", nodeinfo->m_NodeTypeName.c_str(),
+                                                        VERSION_MAJOR(nodeinfo->m_Version), 
+                                                        VERSION_MINOR(nodeinfo->m_Version), 
+                                                        VERSION_PATCH(nodeinfo->m_Version), 
+                                                        VERSION_BUILT(nodeinfo->m_Version));
+            }
+        }
+
+        // load dynamic pin
+        auto pinexRegistry = BP::GetPinExRegistry();
+        plugins.clear(); plugin_names.clear();
+        if (DIR_Iterate(plugin_path, plugins, plugin_names, pin_filter, false) == 0)
+        {
+            LOGI("Load Extra PinEx %s", plugin_real_path.c_str());
+            for (auto pinex_path : plugins)
+            {
+                auto pPinexType = pinexRegistry->RegisterPinEx(pinex_path);
+                if (pPinexType == nullptr) {
+                    LOGE("FAILED to load PinEx from '%s'!", pinex_path.c_str());
+                    continue;
+                }
+                LOGI("Successfully loaded PinEx from '%s'!", pinex_path.c_str());
+            }
+        }
+    }
+}
+
 BluePrintUI::BluePrintUI()
 {
     m_StyleColors[BluePrintStyleColor_TitleBg]              = ImColor(255, 255, 255,  64);
@@ -512,7 +565,7 @@ BluePrintUI::BluePrintUI()
     m_StyleColors[BluePrintStyleColor_PinCustom]            = ImColor(208,  64,  64, 255);
 }
 
-void BluePrintUI::Initialize(const char * bp_file, const char * plugin_path)
+void BluePrintUI::Initialize(const char * bp_file)
 {    
     ImGui::MostRecentlyUsedList::Install(ImGui::GetCurrentContext());
 
@@ -525,53 +578,6 @@ void BluePrintUI::Initialize(const char * bp_file, const char * plugin_path)
     m_Document = make_unique<BluePrint::Document>();
     m_Document->m_UserData = this;
 
-    // load dynamic node
-    auto nodeRegistry = m_Document->m_Blueprint.GetNodeRegistry();
-    std::string plugin_real_path = plugin_path ? std::string(plugin_path) : "";
-    std::vector<std::string> plugins, plugin_names;
-    std::vector<std::string> node_filter = {"node"};
-    std::vector<std::string> pin_filter = {"pin"};
-    if (DIR_Iterate(plugin_real_path, plugins, plugin_names, node_filter, false) == 0)
-    {
-        LOGI("Load Extra Node %s", plugin_real_path.c_str());
-        for (auto node_path : plugins)
-        {
-            auto nodetypeid = nodeRegistry->RegisterNodeType(node_path, &m_Document->m_Blueprint);
-            if (nodetypeid == 0)
-            {
-                LOGE("Load Extra Node Failed %s", node_path.c_str());
-                continue;
-            }
-            auto nodeinfo = nodeRegistry->GetTypeInfo(nodetypeid);
-            if (!nodeinfo)
-            {
-                LOGE("Load Extra Node Failed %s", node_path.c_str());
-                continue;
-            }
-            LOGI("Load Extra Node %s(%d.%d.%d.%d)", nodeinfo->m_NodeTypeName.c_str(),
-                                                    VERSION_MAJOR(nodeinfo->m_Version), 
-                                                    VERSION_MINOR(nodeinfo->m_Version), 
-                                                    VERSION_PATCH(nodeinfo->m_Version), 
-                                                    VERSION_BUILT(nodeinfo->m_Version));
-        }
-    }
-
-    // load dynamic pin
-    auto pinexRegistry = m_Document->m_Blueprint.GetPinExRegistry();
-    plugins.clear(); plugin_names.clear();
-    if (DIR_Iterate(plugin_real_path, plugins, plugin_names, pin_filter, false) == 0)
-    {
-        LOGI("Load Extra PinEx %s", plugin_real_path.c_str());
-        for (auto pinex_path : plugins)
-        {
-            auto pPinexType = pinexRegistry->RegisterPinEx(pinex_path);
-            if (pPinexType == nullptr) {
-                LOGE("FAILED to load PinEx from '%s'!", pinex_path.c_str());
-                continue;
-            }
-            LOGI("Successfully loaded PinEx from '%s'!", pinex_path.c_str());
-        }
-    }
     if (bp_file)
     {
         m_Document->Load(bp_file);

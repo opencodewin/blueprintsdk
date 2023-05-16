@@ -302,7 +302,7 @@ struct IMGUI_API NodeRegistry
     NodeRegistry();
     ~NodeRegistry();
     ID_TYPE RegisterNodeType(shared_ptr<NodeTypeInfo> info);
-    ID_TYPE RegisterNodeType(std::string Path, BP* blueprint);
+    ID_TYPE RegisterNodeType(std::string Path);
     void UnregisterNodeType(std::string name);
     Node* Create(ID_TYPE typeId, BP* blueprint);
     Node* Create(std::string typeName, BP* blueprint);

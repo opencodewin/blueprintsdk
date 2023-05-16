@@ -219,8 +219,9 @@ typedef struct BluePrintCallbackFunctions
 
 struct BluePrintUI
 {
+    static void LoadPlugins(const std::vector<std::string>& pluginPaths);
     BluePrintUI();
-    void Initialize(const char * bp_file = nullptr, const char * plugin_path = nullptr);
+    void Initialize(const char * bp_file = nullptr);
     void Finalize();
     bool Frame(bool child_window = false, bool show_node = true, bool bp_enabled = true, uint32_t flag = BluePrintFlag::BluePrintFlag_All);
     void SetStyle(enum BluePrintStyle style = BluePrintStyle::BP_Style_BluePrint);

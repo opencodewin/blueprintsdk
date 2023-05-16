@@ -38,20 +38,11 @@ ID_TYPE IDGenerator::State() const
 // ----------[ BP ]-----------
 // ---------------------------
 # pragma region BP
-BP::BP(shared_ptr<NodeRegistry> nodeRegistry, shared_ptr<PinExRegistry> pinexRegistry)
-    : m_NodeRegistry(std::move(nodeRegistry))
-    , m_PinExRegistry(std::move(pinexRegistry))
-{
-    if (!m_NodeRegistry)
-        m_NodeRegistry = make_shared<NodeRegistry>();
-    if (!m_PinExRegistry)
-        m_PinExRegistry = make_shared<PinExRegistry>();
-}
+BP::BP()
+{}
 
 BP::BP(const BP& other)
-    : m_NodeRegistry(other.m_NodeRegistry)
-    , m_PinExRegistry(other.m_PinExRegistry)
-    , m_Context(other.m_Context)
+    : m_Context(other.m_Context)
 {
     imgui_json::value value;
     other.Save(value);
@@ -59,9 +50,7 @@ BP::BP(const BP& other)
 }
 
 BP::BP(BP&& other)
-    : m_NodeRegistry(std::move(other.m_NodeRegistry))
-    , m_PinExRegistry(std::move(other.m_PinExRegistry))
-    , m_Generator(std::move(other.m_Generator))
+    : m_Generator(std::move(other.m_Generator))
     , m_Nodes(std::move(other.m_Nodes))
     , m_Pins(std::move(other.m_Pins))
     , m_Context(std::move(other.m_Context))
@@ -82,8 +71,6 @@ BP& BP::operator=(const BP& other)
 
     Clear();
 
-    m_NodeRegistry = other.m_NodeRegistry;
-    m_PinExRegistry = other.m_PinExRegistry;
     m_Context = other.m_Context;
 
     imgui_json::value value;
@@ -98,8 +85,6 @@ BP& BP::operator=(BP&& other)
     if (this == &other)
         return *this;
 
-    m_NodeRegistry  = std::move(other.m_NodeRegistry);
-    m_PinExRegistry = std::move(other.m_PinExRegistry);
     m_Generator     = std::move(other.m_Generator);
     m_Nodes         = std::move(other.m_Nodes);
     m_Pins          = std::move(other.m_Pins);
@@ -113,10 +98,10 @@ BP& BP::operator=(BP&& other)
 
 Node* BP::CreateNode(ID_TYPE nodeTypeId)
 {
-    if (!m_NodeRegistry)
+    if (!s_NodeRegistry)
         return nullptr;
 
-    auto node = m_NodeRegistry->Create(nodeTypeId, this);
+    auto node = s_NodeRegistry->Create(nodeTypeId, this);
     if (!node)
         return nullptr;
 
@@ -127,10 +112,10 @@ Node* BP::CreateNode(ID_TYPE nodeTypeId)
 
 Node* BP::CreateNode(std::string nodeTypeName)
 {
-    if (!m_NodeRegistry)
+    if (!s_NodeRegistry)
         return nullptr;
 
-    auto node = m_NodeRegistry->Create(nodeTypeName, this);
+    auto node = s_NodeRegistry->Create(nodeTypeName, this);
     if (!node)
         return nullptr;
 
@@ -275,14 +260,17 @@ const Pin* BP::FindPin(ID_TYPE pinId) const
     return nullptr;
 }
 
-shared_ptr<NodeRegistry> BP::GetNodeRegistry() const
+shared_ptr<NodeRegistry> BP::s_NodeRegistry = make_shared<NodeRegistry>();
+shared_ptr<PinExRegistry> BP::s_PinExRegistry = make_shared<PinExRegistry>();
+
+shared_ptr<NodeRegistry> BP::GetNodeRegistry()
 {
-    return m_NodeRegistry;
+    return s_NodeRegistry;
 }
 
-shared_ptr<PinExRegistry> BP::GetPinExRegistry() const
+shared_ptr<PinExRegistry> BP::GetPinExRegistry()
 {
-    return m_PinExRegistry;
+    return s_PinExRegistry;
 }
 
 const Context& BP::GetContext() const
@@ -486,7 +474,7 @@ uint32_t BP::StepCount() const
 
 Node * BP::CreateDummyNode(const imgui_json::value& value, BP* blueprint)
 {
-    DummyNode * dummy = (BluePrint::DummyNode *)m_NodeRegistry->Create("DummyNode", blueprint);
+    DummyNode * dummy = (BluePrint::DummyNode *)s_NodeRegistry->Create("DummyNode", blueprint);
     imgui_json::GetTo<imgui_json::number>(value, "id", dummy->m_ID);
     imgui_json::GetTo<imgui_json::string>(value, "name", dummy->m_name);
     imgui_json::GetTo<imgui_json::string>(value, "type_name", dummy->m_type_name);
@@ -521,7 +509,7 @@ int BP::Load(const imgui_json::value& value)
         if (!imgui_json::GetTo<imgui_json::number>(nodeValue, "type_id", typeId)) // required
             return BP_ERR_NODE_LOAD;
 
-        auto node = m_NodeRegistry->Create(typeId, this);
+        auto node = s_NodeRegistry->Create(typeId, this);
         if (!node)
         {
             // Create a Dummy node to replace real node
@@ -564,7 +552,7 @@ int BP::Import(const imgui_json::value& value, ImVec2 pos)
     if (!imgui_json::GetTo<imgui_json::number>(groupValue, "type_id", typeId)) // required
         return BP_ERR_GROUP_LOAD;
 
-    GroupNode *group_node = (GroupNode *)m_NodeRegistry->Create(typeId, this);
+    GroupNode *group_node = (GroupNode *)s_NodeRegistry->Create(typeId, this);
     if (!group_node)
         return BP_ERR_GROUP_LOAD;
 

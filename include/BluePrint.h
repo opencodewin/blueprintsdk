@@ -273,7 +273,7 @@ public:
 # pragma region BP
 struct IMGUI_API BP
 {
-    BP(shared_ptr<NodeRegistry> nodeRegistry = nullptr, shared_ptr<PinExRegistry> pinexRegistry = nullptr);
+    BP();
     BP(const BP& other);
     BP(BP&& other);
     ~BP();
@@ -312,8 +312,8 @@ struct IMGUI_API BP
             Pin* FindPin(ID_TYPE pinId);
     const   Pin* FindPin(ID_TYPE pinId) const;
 
-    shared_ptr<NodeRegistry> GetNodeRegistry() const;
-    shared_ptr<PinExRegistry> GetPinExRegistry() const;
+    static shared_ptr<NodeRegistry> GetNodeRegistry();
+    static shared_ptr<PinExRegistry> GetPinExRegistry();
 
     const Context& GetContext() const;
 
@@ -376,8 +376,8 @@ private:
     void ResetState();
     Node * CreateDummyNode(const imgui_json::value& value, BP* blueprint);
 
-    shared_ptr<NodeRegistry>        m_NodeRegistry;
-    shared_ptr<PinExRegistry>       m_PinExRegistry;
+    static shared_ptr<NodeRegistry>        s_NodeRegistry;
+    static shared_ptr<PinExRegistry>       s_PinExRegistry;
     IDGenerator                     m_Generator;
     std::vector<Node*>              m_Nodes;
     std::vector<Pin*>               m_Pins;

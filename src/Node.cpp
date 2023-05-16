@@ -184,7 +184,7 @@ ID_TYPE NodeRegistry::RegisterNodeType(shared_ptr<NodeTypeInfo> info)
     return id;
 }
 
-ID_TYPE NodeRegistry::RegisterNodeType(std::string Path, BP* blueprint)
+ID_TYPE NodeRegistry::RegisterNodeType(std::string Path)
 {
     auto dlobject = new DLClass<NodeTypeInfo>(Path.c_str());
     if (!dlobject)
