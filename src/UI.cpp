@@ -484,10 +484,32 @@ std::vector<Pin*> NodeCreateDialog::CreateLinkToFirstMatchingPin(Node& node, Pin
 
 namespace BluePrint
 {
-void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths)
+int BluePrintUI::CheckPlugins(const std::vector<std::string>& pluginPaths)
+{
+    int plugin_number = 0;
+    for (auto& plugin_path : pluginPaths)
+    {
+        std::vector<std::string> plugins, plugin_names;
+        std::vector<std::string> node_filter = {"node"};
+        std::vector<std::string> pin_filter = {"pin"};
+        if (DIR_Iterate(plugin_path, plugins, plugin_names, node_filter, false) == 0)
+        {
+            plugin_number += plugins.size();
+        }
+        plugins.clear();
+        if (DIR_Iterate(plugin_path, plugins, plugin_names, pin_filter, false) == 0)
+        {
+            plugin_number += plugins.size();
+        }
+    }
+    return plugin_number;
+}
+
+void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths, int& current_index, std::string& current_message)
 {
     // load dynamic node
     auto nodeRegistry = BP::GetNodeRegistry();
+    current_index = 0;
     for (auto& plugin_path : pluginPaths)
     {
         std::vector<std::string> plugins, plugin_names;
@@ -498,6 +520,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths)
             LOGI("Load Extra Node %s", plugin_real_path.c_str());
             for (auto node_path : plugins)
             {
+                current_index ++;
                 auto nodetypeid = nodeRegistry->RegisterNodeType(node_path);
                 if (nodetypeid == 0)
                 {
@@ -515,6 +538,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths)
                                                         VERSION_MINOR(nodeinfo->m_Version), 
                                                         VERSION_PATCH(nodeinfo->m_Version), 
                                                         VERSION_BUILT(nodeinfo->m_Version));
+                current_message = nodeinfo->m_Name;
             }
         }
 
@@ -523,6 +547,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths)
         plugins.clear(); plugin_names.clear();
         if (DIR_Iterate(plugin_path, plugins, plugin_names, pin_filter, false) == 0)
         {
+            current_index ++;
             LOGI("Load Extra PinEx %s", plugin_real_path.c_str());
             for (auto pinex_path : plugins)
             {
@@ -532,6 +557,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths)
                     continue;
                 }
                 LOGI("Successfully loaded PinEx from '%s'!", pinex_path.c_str());
+                current_message = pPinexType->GetName();
             }
         }
     }
