@@ -149,13 +149,13 @@ struct NodeDeleteDialog
 
 enum BluePrintFlag : int32_t
 {
-    BluePrintFlag_None = 0,
-    BluePrintFlag_Filter = 1,
-    BluePrintFlag_Fusion = 1 << 1,
-    BluePrintFlag_System = 1 << 2,
+    BluePrintFlag_None          = 0,
+    BluePrintFlag_Filter        = 1,
+    BluePrintFlag_Transition    = 1 << 1,
+    BluePrintFlag_System        = 1 << 2,
     // layout
-    BluePrintFlag_Vertical = 1 << 8,
-    BluePrintFlag_All = 1 << 31,
+    BluePrintFlag_Vertical      = 1 << 8,
+    BluePrintFlag_All           = 1 << 31,
 };
 
 struct NodeCreateDialog
@@ -276,7 +276,7 @@ public:
     bool File_Export(Node * group_node);
     bool File_New();
     bool File_New_Filter(imgui_json::value& bp, std::string name, std::string sfilter);
-    bool File_New_Fusion(imgui_json::value& bp, std::string name, std::string sfilter);
+    bool File_New_Transition(imgui_json::value& bp, std::string name, std::string sfilter);
     bool File_SaveAsEx(std::string path);
     bool File_SaveAs();
     bool File_Save();
@@ -313,8 +313,8 @@ public:
 
     bool Blueprint_SetFilter(const std::string name, const PinValue& value);
     bool Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output);
-    bool Blueprint_SetFusion(const std::string name, const PinValue& value);
-    bool Blueprint_RunFusion(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration);
+    bool Blueprint_SetTransition(const std::string name, const PinValue& value);
+    bool Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration);
 
     Action m_File_Open       = { "Open...",         ICON_OPEN_BLUEPRINT,   [this] { File_Open();        } };
     Action m_File_Import     = { "Import...",       ICON_IMPORT_GROUP,     [this] { File_Import();      } };
@@ -365,7 +365,7 @@ private:
 private:
     void                CreateNewDocument();
     void                CreateNewFilterDocument();
-    void                CreateNewFusionDocument();
+    void                CreateNewTransitionDocument();
     void                CommitLinksToEditor();
     bool                ReadyToQuit {false};
 

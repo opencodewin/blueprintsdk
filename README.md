@@ -2,7 +2,7 @@
 
 <p align="center" ><img src="docs/assets/bp.png" /></p>
 
-BluePrintSDK is the core of Media filters and fusions in **[MediaEditor](https://github.com/opencodewin/MediaEditor.git)**. Blueprint is a form composed of **multiple nodes** that can **handle complex functions** through the flows between nodes. Node is the basic unit in the blueprint, it's a function module.
+BluePrintSDK is the core of Media filters and transitions in **[MediaEditor](https://github.com/opencodewin/MediaEditor.git)**. Blueprint is a form composed of **multiple nodes** that can **handle complex functions** through the flows between nodes. Node is the basic unit in the blueprint, it's a function module.
 
 ## INTRODUCTION
 

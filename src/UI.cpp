@@ -361,9 +361,9 @@ void NodeCreateDialog::Open(Pin* fromPin, uint32_t flag)
     {
         ImGui::OpenPopup("##create_filter_node");
     }
-    else if ((flag & BluePrintFlag::BluePrintFlag_Fusion) != 0)
+    else if ((flag & BluePrintFlag::BluePrintFlag_Transition) != 0)
     {
-        ImGui::OpenPopup("##create_fusion_node");
+        ImGui::OpenPopup("##create_transition_node");
     }
     else if ((flag & BluePrintFlag::BluePrintFlag_System) != 0)
     {
@@ -381,7 +381,7 @@ void NodeCreateDialog::Show(BluePrintUI& UI)
     std::string catalog_filter = "";
     if (!ImGui::IsPopupOpen("##create_node") &&
         !ImGui::IsPopupOpen("##create_filter_node") &&
-        !ImGui::IsPopupOpen("##create_fusion_node") &&
+        !ImGui::IsPopupOpen("##create_transition_node") &&
         !ImGui::IsPopupOpen("##create_system_node"))
     {
         UI.m_isNewNodePopuped = false;
@@ -402,10 +402,10 @@ void NodeCreateDialog::Show(BluePrintUI& UI)
             catalog_filter += "#" + UI.m_Document->m_CatalogFilter;
         }
     }
-    else if (ImGui::IsPopupOpen("##create_fusion_node"))
+    else if (ImGui::IsPopupOpen("##create_transition_node"))
     {
-        create_node_label = "##create_fusion_node";
-        catalog_filter = "Fusion";
+        create_node_label = "##create_transition_node";
+        catalog_filter = "Transition";
         if (!UI.m_Document->m_CatalogFilter.empty())
         {
             catalog_filter += "#" + UI.m_Document->m_CatalogFilter;
@@ -879,10 +879,10 @@ void BluePrintUI::CreateNewFilterDocument()
     blueprint->SetOpen(true);
 }
 
-void BluePrintUI::CreateNewFusionDocument()
+void BluePrintUI::CreateNewTransitionDocument()
 {
     auto blueprint = &m_Document->m_Blueprint;
-    auto entryPointNode = blueprint->CreateNode<BluePrint::FusionEntryPointNode>();
+    auto entryPointNode = blueprint->CreateNode<BluePrint::TransitionEntryPointNode>();
                             ed::SetNodePosition(entryPointNode->m_ID, ImVec2(32, 32));
 
     auto view_size = ed::GetViewSize();
@@ -2762,9 +2762,9 @@ void BluePrintUI::HandleContextMenuAction(uint32_t flag)
             {
                 ImGui::OpenPopup("##create_filter_node");
             }
-            else if ((flag & BluePrintFlag::BluePrintFlag_Fusion) != 0)
+            else if ((flag & BluePrintFlag::BluePrintFlag_Transition) != 0)
             {
-                ImGui::OpenPopup("##create_fusion_node");
+                ImGui::OpenPopup("##create_transition_node");
             }
             else if ((flag & BluePrintFlag::BluePrintFlag_System) != 0)
             {
@@ -3067,7 +3067,7 @@ bool BluePrintUI::File_New_Filter(imgui_json::value& bp, std::string name, std::
     return true;
 }
 
-bool BluePrintUI::File_New_Fusion(imgui_json::value& bp, std::string name, std::string sfilter)
+bool BluePrintUI::File_New_Transition(imgui_json::value& bp, std::string name, std::string sfilter)
 {
     ed::SetCurrentEditor(m_Editor);
     ed::ClearSelection();
@@ -3078,7 +3078,7 @@ bool BluePrintUI::File_New_Fusion(imgui_json::value& bp, std::string name, std::
         if (m_Document->Deserialize(bp, *m_Document) != BP_ERR_NONE || m_Document->m_Blueprint.GetNodes().size() == 0)
         {
             // TODO::Dicky if node load failed, may not CreateNewDocument
-            CreateNewFusionDocument();
+            CreateNewTransitionDocument();
             m_Document->OnMakeCurrent();
             bp = m_Document->Serialize();
         }
@@ -3089,12 +3089,12 @@ bool BluePrintUI::File_New_Fusion(imgui_json::value& bp, std::string name, std::
     }
     else
     {
-        CreateNewFusionDocument();
+        CreateNewTransitionDocument();
         m_Document->OnMakeCurrent();
         bp = m_Document->Serialize();
     }
     if (name.empty())
-        m_Document->m_Name = "FusionBluePrint";
+        m_Document->m_Name = "TransitionBluePrint";
     else
         m_Document->m_Name = name;
 
@@ -3409,14 +3409,14 @@ bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output)
     return true;
 }
 
-bool BluePrintUI::Blueprint_SetFusion(const std::string name, const PinValue& value)
+bool BluePrintUI::Blueprint_SetTransition(const std::string name, const PinValue& value)
 {
     if (!Blueprint_IsValid())
         return false;
     auto entry_node = FindEntryPointNode();
     if (!entry_node)
         return false;
-    FusionEntryPointNode * entryNode = (FusionEntryPointNode *)entry_node;
+    TransitionEntryPointNode * entryNode = (TransitionEntryPointNode *)entry_node;
     FloatPin * pin = (FloatPin * )entryNode->FindPin(name);
     if (pin)
     {
@@ -3425,7 +3425,7 @@ bool BluePrintUI::Blueprint_SetFusion(const std::string name, const PinValue& va
     return false;
 }
 
-bool BluePrintUI::Blueprint_RunFusion(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration)
+bool BluePrintUI::Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration)
 {
     if (!Blueprint_IsValid())
         return false;
@@ -3434,14 +3434,12 @@ bool BluePrintUI::Blueprint_RunFusion(ImGui::ImMat& input_first, ImGui::ImMat& i
     if (!entry_node || !exit_node)
         return false;
     
-    FusionEntryPointNode * entryNode = (FusionEntryPointNode *)entry_node;
+    TransitionEntryPointNode * entryNode = (TransitionEntryPointNode *)entry_node;
     MatExitPointNode * exitNode = (MatExitPointNode *)exit_node;
     float progress = (float)current / (float)duration;
     entryNode->m_MatOutFirst.SetValue(input_first);
     entryNode->m_MatOutSecond.SetValue(input_second);
-    entryNode->m_FusionPos.SetValue(progress);
-    //entryNode->m_FusionDuration.SetValue(duration);
-    //entryNode->m_FusionTimeStamp.SetValue(current);
+    entryNode->m_TransitionPos.SetValue(progress);
     auto result = m_Document->m_Blueprint.Run(*entryNode);
     if (result == StepResult::Error)
     {

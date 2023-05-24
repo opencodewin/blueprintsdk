@@ -109,7 +109,7 @@ NodeRegistry::NodeRegistry()
         SystemEntryPointNode::GetStaticTypeInfo(),
         SystemExitPointNode::GetStaticTypeInfo(),
         FilterEntryPointNode::GetStaticTypeInfo(),
-        FusionEntryPointNode::GetStaticTypeInfo(),
+        TransitionEntryPointNode::GetStaticTypeInfo(),
         MatExitPointNode::GetStaticTypeInfo(),
         CommentNode::GetStaticTypeInfo(),
         GroupNode::GetStaticTypeInfo(),

@@ -2,17 +2,17 @@
 #include <imgui.h>
 namespace BluePrint
 {
-struct FusionEntryPointNode final : Node
+struct TransitionEntryPointNode final : Node
 {
-    BP_NODE(FusionEntryPointNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::EntryPoint, NodeStyle::Simple, "System")
+    BP_NODE(TransitionEntryPointNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::EntryPoint, NodeStyle::Simple, "System")
 
-    FusionEntryPointNode(BP* blueprint): Node(blueprint) 
+    TransitionEntryPointNode(BP* blueprint): Node(blueprint) 
     {
         m_Name = "Start"; 
         m_OutputPins.push_back(&m_Exit);
         m_OutputPins.push_back(&m_MatOutFirst);
         m_OutputPins.push_back(&m_MatOutSecond);
-        m_OutputPins.push_back(&m_FusionPos);
+        m_OutputPins.push_back(&m_TransitionPos);
     }
 
     FlowPin Execute(Context& context, FlowPin& entryPoint, bool threading = false) override
@@ -143,13 +143,13 @@ struct FusionEntryPointNode final : Node
 
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
     Pin* GetAutoLinkOutputFlowPin() override { return &m_Exit; }
-    vector<Pin*> GetAutoLinkOutputDataPin() override { return {&m_MatOutFirst, &m_MatOutSecond, &m_FusionPos}; }
+    vector<Pin*> GetAutoLinkOutputDataPin() override { return {&m_MatOutFirst, &m_MatOutSecond, &m_TransitionPos}; }
     FlowPin* GetOutputFlowPin() override { return &m_Exit; }
 
     FlowPin m_Exit = { this, "Start" };
     MatPin  m_MatOutFirst = { this, "Out First" };
     MatPin  m_MatOutSecond = { this, "Out Second" };
-    FloatPin m_FusionPos = { this, "Pos" };
+    FloatPin m_TransitionPos = { this, "Pos" };
 
     std::vector<Pin *> m_OutputPins;
 };
