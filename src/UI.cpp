@@ -2908,12 +2908,12 @@ void BluePrintUI::CleanStateStorage()
         auto storage = ImGui::GetStateStorage();
         if (storage && current_window)
         {
-            storage->SetVoidPtr(ImGui::GetID("##node-context-menu-node"), nullptr);
-            storage->SetVoidPtr(ImGui::GetID("##pin-context-menu-pin"), nullptr);
-            storage->SetVoidPtr(ImGui::GetID("##link-context-menu-pin"), nullptr);
-            storage->SetVoidPtr(ImGui::GetID("##setting-node"), nullptr);
-            storage->SetVoidPtr(ImGui::GetID("##delete-node"), nullptr);
-            storage->SetVoidPtr(ImGui::GetID("##create_node_pin"), nullptr);
+            storage->SetVoidPtr(current_window->GetID("##node-context-menu-node"), nullptr);
+            storage->SetVoidPtr(current_window->GetID("##pin-context-menu-pin"), nullptr);
+            storage->SetVoidPtr(current_window->GetID("##link-context-menu-pin"), nullptr);
+            storage->SetVoidPtr(current_window->GetID("##setting-node"), nullptr);
+            storage->SetVoidPtr(current_window->GetID("##delete-node"), nullptr);
+            storage->SetVoidPtr(current_window->GetID("##create_node_pin"), nullptr);
         }
     }
 }
