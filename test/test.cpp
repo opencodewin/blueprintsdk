@@ -125,6 +125,7 @@ void Application_Setup(ApplicationWindowProperty& property)
     property.application.Application_Finalize = BlueprintTest_Finalize;
     property.application.Application_Frame = BlueprintTest_Frame;
     int index = 0;
+    float percentage = 0;
     std::string message;
-    BluePrint::BluePrintUI::LoadPlugins(plugin_path, index, message);
+    BluePrint::BluePrintUI::LoadPlugins(plugin_path, index, message, percentage, 0);
 }

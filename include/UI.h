@@ -219,7 +219,7 @@ typedef struct BluePrintCallbackFunctions
 
 struct BluePrintUI
 {
-    static void LoadPlugins(const std::vector<std::string>& pluginPaths, int& current_index, std::string& current_message);
+    static void LoadPlugins(const std::vector<std::string>& pluginPaths, int& current_index, std::string& current_message, float& loading_percentage, int expect_count);
     static int CheckPlugins(const std::vector<std::string>& pluginPaths);
     BluePrintUI();
     void Initialize(const char * bp_file = nullptr);

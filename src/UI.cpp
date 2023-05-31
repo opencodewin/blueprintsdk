@@ -505,7 +505,7 @@ int BluePrintUI::CheckPlugins(const std::vector<std::string>& pluginPaths)
     return plugin_number;
 }
 
-void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths, int& current_index, std::string& current_message)
+void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths, int& current_index, std::string& current_message, float& loading_percentage, int expect_count)
 {
     // load dynamic node
     auto nodeRegistry = BP::GetNodeRegistry();
@@ -521,6 +521,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths, int& 
             for (auto node_path : plugins)
             {
                 current_index ++;
+                if (expect_count > 0) loading_percentage = std::min((float)current_index / (float)expect_count, 1.f);
                 auto nodetypeid = nodeRegistry->RegisterNodeType(node_path);
                 if (nodetypeid == 0)
                 {
@@ -548,6 +549,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths, int& 
         if (DIR_Iterate(plugin_path, plugins, plugin_names, pin_filter, false) == 0)
         {
             current_index ++;
+            if (expect_count > 0) loading_percentage = std::min((float)current_index / (float)expect_count, 1.f);
             LOGI("Load Extra PinEx %s", plugin_real_path.c_str());
             for (auto pinex_path : plugins)
             {
