@@ -2970,6 +2970,15 @@ bool BluePrintUI::Blueprint_IsExecutable()
     return true;
 }
 
+bool BluePrintUI::Blueprint_IsEmpty()
+{
+    if (!Blueprint_IsValid())
+        return true;
+    if (m_Document->m_Blueprint.GetNodes().size() <= 2)
+        return true;
+    return false;
+}
+
 bool BluePrintUI::File_Open(std::string path, string* error)
 {
     if (File_IsOpen())

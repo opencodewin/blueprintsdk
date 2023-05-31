@@ -266,6 +266,7 @@ public:
     void    Thumbnails(float view_expand = 1.0f, ImVec2 size = ImVec2(0, 0), ImVec2 pos = ImVec2(-1, -1));
     bool    Blueprint_IsValid();
     bool    Blueprint_IsExecutable();
+    bool    Blueprint_IsEmpty();
 
     bool File_IsOpen();
     bool File_IsModified();
