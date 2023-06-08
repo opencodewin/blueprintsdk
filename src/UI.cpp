@@ -1088,6 +1088,7 @@ float BluePrintUI::DrawNodeToolBar(Node *node, Node **need_clone_node)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, m_StyleColors[BluePrintStyleColor_ToolButtonActive]);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0,0));
+    ImGui::PushStyleVar(ImGuiStyleVar_TexGlyphShadowOffset, ImVec2(2.0, 2.0));
 
     auto node_size = ed::GetNodeSize(node->m_ID);
     float icon_offset = 16 + 2; // base offset + resize speed
@@ -1157,7 +1158,7 @@ float BluePrintUI::DrawNodeToolBar(Node *node, Node **need_clone_node)
     if (ImGui::IsItemHovered()) node->m_IconHovered = 0;
 
     ImGui::EndDisabled();
-    ImGui::PopStyleVar(2);
+    ImGui::PopStyleVar(3);
     ImGui::PopStyleColor(3);
     return icon_offset;
 }
@@ -1290,7 +1291,7 @@ void BluePrintUI::DrawNodes()
             ImGui::BeginHorizontal("horizontal");
             ImFont* font = HeaderFont();
             if (font) ImGui::PushFont(font);
-            ImGui::AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(128, 128, 128, 255));
+            ImGui::AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(32, 32, 32, 255));
             ImGui::Dummy(ImVec2(0, ImGui::GetFontSize()));
             if (font) ImGui::PopFont();
             ImGui::EndHorizontal();
@@ -1571,7 +1572,7 @@ void BluePrintUI::DrawNodes()
             ImGui::Dummy(ImVec2(0.1f, 0.f)); ImGui::SameLine(0);
             ImFont* font = HeaderFont();
             if (font) ImGui::PushFont(font);
-            ImGui::AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(128, 128, 128, 255));
+            ImGui::AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(32, 32, 32, 255));
             ImGui::Dummy(ImVec2(0, ImGui::GetFontSize()));
             if (font) ImGui::PopFont();
             const float titleTextSize = ImGui::CalcTextSize(nodeName.c_str()).x;
@@ -3707,6 +3708,7 @@ void BluePrintUI::ShowShortToolbar(bool vertical, bool* show)
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, m_StyleColors[BluePrintStyleColor_ToolButtonHovered]);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, m_StyleColors[BluePrintStyleColor_ToolButtonActive]);
     ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0, 1.0, 1.0, 0.8));
+    ImGui::PushStyleVar(ImGuiStyleVar_TexGlyphShadowOffset, ImVec2(2.0, 2.0));
 
     ImGui::SetNextWindowPos(window_pos + ImVec2(vertical ? window_size.x - 48 : window_size.x - 432, 8));
     if (ImGui::Begin("##embedded_toolbar", show, window_flags))
@@ -3774,6 +3776,7 @@ void BluePrintUI::ShowShortToolbar(bool vertical, bool* show)
         //if (!vertical) { ImGui::SameLine(); ImGui::Text("%f (%f,%f)", ed::GetCurrentZoom(), ed::GetCurrentOrigin().x, ed::GetCurrentOrigin().y); }
     }
     ImGui::End();
+    ImGui::PopStyleVar();
     ImGui::PopStyleColor(4);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
@@ -3798,6 +3801,7 @@ void BluePrintUI::ShowToolbar(bool* show)
     ImGui::PushStyleColor(ImGuiCol_Button, m_StyleColors[BluePrintStyleColor_ToolButton]);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, m_StyleColors[BluePrintStyleColor_ToolButtonHovered]);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, m_StyleColors[BluePrintStyleColor_ToolButtonActive]);
+    ImGui::PushStyleVar(ImGuiStyleVar_TexGlyphShadowOffset, ImVec2(2.0, 2.0));
     if (ImGui::Begin("##floating_toolbar", show, window_flags))
     {
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -3900,6 +3904,7 @@ void BluePrintUI::ShowToolbar(bool* show)
         ImGui::Dummy(ImVec2(20, 0));
     }
     ImGui::End();
+    ImGui::PopStyleVar();
     ImGui::PopStyleColor(3);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {

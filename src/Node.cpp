@@ -507,12 +507,17 @@ void Node::DrawNodeLogo(ImGuiContext * ctx, ImVec2 size, std::string logo) const
     if (ctx) ImGui::SetCurrentContext(ctx); // External Node must set context
     float font_size = ImGui::GetFontSize();
     float size_min = size.x > size.y ? size.y : size.x;
-    ImGui::SetWindowFontScale((size_min - 16) / font_size);
+    float font_scale = (size_min - 16) / font_size;
+    float font_shadow = font_scale + 2;
+    ImGui::SetWindowFontScale(font_scale);
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_TexGlyphShadow, ImVec4(0, 0, 0, 1.0));
+    ImGui::PushStyleVar(ImGuiStyleVar_TexGlyphShadowOffset, ImVec2(font_shadow, font_shadow));
     ImGui::Button((logo + "##" + std::to_string(m_ID)).c_str(), size); // set default logo is a icon button
-    ImGui::PopStyleColor(3);
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(4);
     ImGui::SetWindowFontScale(1.0);
 }
 
