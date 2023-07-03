@@ -3546,6 +3546,69 @@ bool BluePrintUI::Blueprint_BreakPoint()
     return true;
 }
 
+bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
+{
+    if (!m_Document)
+        return false;
+    if (!Blueprint_IsValid())
+        return false;
+    ed::SetCurrentEditor(m_Editor);
+    auto new_node = m_Document->m_Blueprint.CreateNode(id);
+    if (!new_node)
+        return false;
+    auto exitNode = FindExitPointNode(); // must be existed, check by Blueprint_IsValid()
+    auto exit_flow_pin = exitNode->GetAutoLinkInputFlowPin();
+    auto exit_data_pin = exitNode->GetAutoLinkInputDataPin();
+    auto new_flow_in_pin = new_node->GetAutoLinkInputFlowPin();
+    auto new_data_in_pin = new_node->GetAutoLinkInputDataPin();
+    auto new_flow_out_pin = new_node->GetAutoLinkOutputFlowPin();
+    auto new_data_out_pin = new_node->GetAutoLinkOutputDataPin();
+    if (exit_flow_pin && exit_flow_pin->m_LinkFrom.size() > 0)
+    {
+        for (auto link_id : exit_flow_pin->m_LinkFrom)
+        {
+            auto link_pin = m_Document->m_Blueprint.GetPinFromID(link_id);
+            // re-link prev node flow to new_node
+            if (new_flow_in_pin)
+            {
+                link_pin->LinkTo(*new_flow_in_pin);
+            }
+            // re-link new node flow to exitPoint node
+            if (new_flow_out_pin)
+            {
+                new_flow_out_pin->LinkTo(*exit_flow_pin);
+            }
+        }
+    }
+    if (exit_data_pin.size() > 0 && new_data_out_pin.size() > 0 && exit_data_pin.size() == new_data_out_pin.size())
+    {
+        for (int i = 0; i < exit_data_pin.size(); i++)
+        {
+            auto in_pin = exit_data_pin[i];
+            auto out_pin = new_data_out_pin[i];
+            // unlink current data
+            auto linked_pin = in_pin->m_LinkPin;
+            if (linked_pin)
+                ed::DeleteLink(linked_pin->m_ID);
+            // re-link new_node data to exitPoint node
+            in_pin->LinkTo(*out_pin);
+            if (linked_pin && new_data_in_pin.size() > 0)
+            {
+                // re-link prev data to new node data pin
+                new_data_in_pin[0]->LinkTo(*linked_pin);
+            }
+        }
+    }
+    // TODO::Dicky need update node position, but how?
+
+    if (m_CallBacks.BluePrintOnChanged)
+    {
+        m_CallBacks.BluePrintOnChanged(BP_CB_NODE_APPEND, m_Document->m_Name, m_UserHandle);
+    }
+    m_Document->m_IsModified = true;
+    return true;
+}
+
 bool BluePrintUI::File_Export(Node * group_node)
 {
     const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;

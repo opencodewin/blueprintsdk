@@ -188,6 +188,8 @@ enum BluePrintCallBack:int
     BP_CB_Unknown = -1,
     BP_CB_Link,
     BP_CB_Unlink,
+    BP_CB_NODE_APPEND,
+    BP_CB_NODE_INSERT,
     BP_CB_NODE_DELETED,
     BP_CB_PARAM_CHANGED,
     BP_CB_SETTING_CHANGED,
@@ -309,6 +311,8 @@ public:
     bool Blueprint_Next();
     bool Blueprint_Current();
     bool Blueprint_BreakPoint();
+
+    bool Blueprint_AppendNode(ID_TYPE id);
 
     Node* FindEntryPointNode();
     Node* FindExitPointNode();
