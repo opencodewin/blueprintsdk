@@ -1219,6 +1219,64 @@ void BluePrintUI::CommitLinksToEditor()
     }
 }
 
+ImVec2 BluePrintUI::Blueprint_EstimateNodeSize(Node* node)
+{
+    ImVec2 node_size = ed::GetNodeSize(node->m_ID);
+    if (CheckNodeStyle(node, NodeStyle::Group))
+        return node_size;
+    if (node_size.x <= 0 || node_size.y <= 0)
+    {
+        node_size = ImVec2(0, 0);
+        const auto iconSize = ImVec2(ImGui::GetTextLineHeight(), ImGui::GetTextLineHeight());
+        auto isDummy = node->GetStyle() == NodeStyle::Dummy;
+        auto isSimple = node->GetStyle() == NodeStyle::Simple;
+        auto nodeName = !isDummy ? node->GetName() : ((DummyNode *)node)->m_name + "*load fail*";
+        if (!nodeName.empty())
+        {
+            const float titleTextWidth = ImGui::CalcTextSize(nodeName.c_str()).x;
+            const float titleTextHeight = ImGui::CalcTextSize(nodeName.c_str()).y;
+            node_size.x += titleTextWidth;
+            if (!isDummy && !isSimple) node_size.x += 18 * 6;
+            if (!isSimple) node_size.y += titleTextHeight;
+        }
+
+        int max_pin_width = 0;
+        for (auto& pin : node->GetInputPins())
+        {
+            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->CustomLayout() || m_isChildWindow)) 
+            {
+                const float pinwidth = ImGui::CalcTextSize(pin->m_Name.c_str()).x;
+                if (max_pin_width < pinwidth) max_pin_width = pinwidth;
+            }
+        }
+        node_size.x += max_pin_width;
+        max_pin_width = 0;
+        for (auto& pin : node->GetOutputPins())
+        {
+            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->CustomLayout() || m_isChildWindow)) 
+            {
+                const float pinwidth = ImGui::CalcTextSize(pin->m_Name.c_str()).x;
+                if (max_pin_width < pinwidth) max_pin_width = pinwidth;
+            }
+        }
+        node_size.x += max_pin_width;
+        if (node->CustomLayout() && !m_isChildWindow)
+        {
+            // hard to estimate
+            node_size.x += 200;
+            node_size.y += 200;
+        }
+        else if (m_isChildWindow)
+        {
+            node_size.x += 200;
+        }
+        int pins = ImMax(node->GetInputPins().size(),node->GetOutputPins().size());
+        node_size.y = ImMax(node_size.y, (float)(pins * (16 + 4) + 4));
+    }
+
+    return node_size;
+}
+
 void BluePrintUI::DrawNodes()
 {
     if (!m_Document)
@@ -3609,17 +3667,20 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
             }
         }
     }
-    // TODO::Dicky need update node position, but how?
+
     auto exit_node_pos = ed::GetNodePosition(exitNode->m_ID);
     auto new_node_pos = exit_node_pos;
     if (last_linked_node)
     {
         auto _pos = ed::GetNodePosition(last_linked_node->m_ID);
         auto _size = ed::GetNodeSize(last_linked_node->m_ID);
+        auto _current_size = Blueprint_EstimateNodeSize(new_node);
+        _current_size.x = _current_size.x > 0 ? _current_size.x + 50 : 400;
         float space = exit_node_pos.x - (_pos.x + _size.x);
-        if (space < 400)
+
+        if (space < _current_size.x)
         {
-            exit_node_pos.x = _pos.x + _size.x + 400;
+            exit_node_pos.x = _pos.x + _size.x + _current_size.x;
             ed::SetNodePosition(exitNode->m_ID, exit_node_pos);
         }
         new_node_pos.x = _pos.x + _size.x + 50;
