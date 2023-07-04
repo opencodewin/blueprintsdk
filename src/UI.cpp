@@ -3556,7 +3556,9 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
     auto new_node = m_Document->m_Blueprint.CreateNode(id);
     if (!new_node)
         return false;
+    
     auto exitNode = FindExitPointNode(); // must be existed, check by Blueprint_IsValid()
+    BluePrint::Node* last_linked_node = nullptr;
     auto exit_flow_pin = exitNode->GetAutoLinkInputFlowPin();
     auto exit_data_pin = exitNode->GetAutoLinkInputDataPin();
     auto new_flow_in_pin = new_node->GetAutoLinkInputFlowPin();
@@ -3578,6 +3580,10 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
             {
                 new_flow_out_pin->LinkTo(*exit_flow_pin);
             }
+            if (!last_linked_node)
+            {
+                last_linked_node = link_pin->m_Node;
+            }
         }
     }
     if (exit_data_pin.size() > 0 && new_data_out_pin.size() > 0 && exit_data_pin.size() == new_data_out_pin.size())
@@ -3597,9 +3603,33 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
                 // re-link prev data to new node data pin
                 new_data_in_pin[0]->LinkTo(*linked_pin);
             }
+            if (!last_linked_node && linked_pin)
+            {
+                last_linked_node = linked_pin->m_Node;
+            }
         }
     }
     // TODO::Dicky need update node position, but how?
+    auto exit_node_pos = ed::GetNodePosition(exitNode->m_ID);
+    auto new_node_pos = exit_node_pos;
+    if (last_linked_node)
+    {
+        auto _pos = ed::GetNodePosition(last_linked_node->m_ID);
+        auto _size = ed::GetNodeSize(last_linked_node->m_ID);
+        float space = exit_node_pos.x - (_pos.x + _size.x);
+        if (space < 400)
+        {
+            exit_node_pos.x = _pos.x + _size.x + 400;
+            ed::SetNodePosition(exitNode->m_ID, exit_node_pos);
+        }
+        new_node_pos.x = _pos.x + _size.x + 50;
+    }
+    else
+    {
+        new_node_pos.x = exit_node_pos.x - 350;
+    }
+
+    ed::SetNodePosition(new_node->m_ID, new_node_pos);
 
     if (m_CallBacks.BluePrintOnChanged)
     {
