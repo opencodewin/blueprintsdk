@@ -3633,15 +3633,15 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
             {
                 link_pin->LinkTo(*new_flow_in_pin);
             }
-            // re-link new node flow to exitPoint node
-            if (new_flow_out_pin)
-            {
-                new_flow_out_pin->LinkTo(*exit_flow_pin);
-            }
             if (!last_linked_node)
             {
                 last_linked_node = link_pin->m_Node;
             }
+        }
+        // re-link new node flow to exitPoint node
+        if (new_flow_out_pin)
+        {
+            new_flow_out_pin->LinkTo(*exit_flow_pin);
         }
     }
     if (exit_data_pin.size() > 0 && new_data_out_pin.size() > 0 && exit_data_pin.size() == new_data_out_pin.size())
@@ -3673,7 +3673,8 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
     if (last_linked_node)
     {
         auto _pos = ed::GetNodePosition(last_linked_node->m_ID);
-        auto _size = ed::GetNodeSize(last_linked_node->m_ID);
+        auto _size = Blueprint_EstimateNodeSize(last_linked_node);
+        _size.x = _size.x > 0 ? _size.x : 350;
         auto _current_size = Blueprint_EstimateNodeSize(new_node);
         _current_size.x = _current_size.x > 0 ? _current_size.x + 50 : 400;
         float space = exit_node_pos.x - (_pos.x + _size.x);
@@ -3697,6 +3698,227 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
         m_CallBacks.BluePrintOnChanged(BP_CB_NODE_APPEND, m_Document->m_Name, m_UserHandle);
     }
     m_Document->m_IsModified = true;
+    return true;
+}
+
+bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
+{
+    ed::SetCurrentEditor(m_Editor);
+    auto src = m_Document->m_Blueprint.FindNode(src_id);
+    auto dst = m_Document->m_Blueprint.FindNode(dst_id);
+    if (!src || !dst)
+        return false;
+    auto src_pos = ed::GetNodePosition(src->m_ID);
+    auto dst_pos = ed::GetNodePosition(dst->m_ID);
+    vector<std::pair<Pin *, Pin *>> relink_pairs;
+
+    auto src_flow_in_pin = src->GetAutoLinkInputFlowPin();
+    auto dst_flow_in_pin = dst->GetAutoLinkInputFlowPin();
+    auto src_flow_out_pin = src->GetAutoLinkOutputFlowPin();
+    auto dst_flow_out_pin = dst->GetAutoLinkOutputFlowPin();
+
+    auto src_data_in_pin = src->GetAutoLinkInputDataPin();
+    auto dst_data_in_pin = dst->GetAutoLinkInputDataPin();
+    auto src_data_out_pin = src->GetAutoLinkOutputDataPin();
+    auto dst_data_out_pin = dst->GetAutoLinkOutputDataPin();
+
+    bool is_connected = false;
+    int connect_direction = -1;
+    if (src_flow_out_pin && dst_flow_in_pin && src_flow_out_pin->m_Link == dst_flow_in_pin->m_ID)
+    {
+        is_connected = true;
+        connect_direction = 0; // src -> dst
+    }
+    if (dst_flow_out_pin && src_flow_in_pin && dst_flow_out_pin->m_Link == src_flow_in_pin->m_ID)
+    {
+        is_connected = true; 
+        connect_direction = 1; // dst -> src
+    }
+    if (is_connected)
+    {
+        if (connect_direction == 0)
+        {
+            // src -> dst
+            // link dst out flow into src
+            std::pair<Pin *, Pin *> re_link(dst_flow_out_pin, src_flow_in_pin);
+            relink_pairs.push_back(re_link);
+            // link src out flow into dst out links
+            std::pair<Pin *, Pin *> re_link_out(src_flow_out_pin, dst_flow_out_pin->m_LinkPin);
+            relink_pairs.push_back(re_link_out);
+            // link src input flow to dst input flow
+            for (auto from_pin : src_flow_in_pin->m_LinkFrom)
+            {
+                auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                std::pair<Pin *, Pin *> re_link_in(pin, dst_flow_in_pin);
+                relink_pairs.push_back(re_link_in);
+            }
+
+            // link dst out data into src
+            for (int i = 0; i < dst_data_out_pin.size(); i++)
+            {
+                if (i < src_data_in_pin.size())
+                {
+                    std::pair<Pin *, Pin *> re_link_data(src_data_in_pin[i], dst_data_out_pin[i]);
+                    relink_pairs.push_back(re_link_data);
+                }
+            }
+
+            // link src out data into dst out data links
+            for (int i = 0; i < src_data_out_pin.size(); i++)
+            {
+                if (i < dst_data_out_pin.size())
+                {
+                    for (auto from_pin : dst_data_out_pin[i]->m_LinkFrom)
+                    {
+                        auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                        std::pair<Pin *, Pin *> re_link_in(pin, src_data_out_pin[i]);
+                        relink_pairs.push_back(re_link_in);
+                    }
+                }
+            }
+
+            // link src input data to dst input data
+            for (int i = 0; i < src_data_in_pin.size(); i++)
+            {
+                if (i < dst_data_in_pin.size())
+                {
+                    std::pair<Pin *, Pin *> re_link_in(dst_data_in_pin[i], src_data_in_pin[i]->m_LinkPin);
+                    relink_pairs.push_back(re_link_in);
+                }
+            }
+        }
+        else
+        {
+            // dst -> src
+            // link src out flow into dst
+            std::pair<Pin *, Pin *> re_link(src_flow_out_pin, dst_flow_in_pin);
+            relink_pairs.push_back(re_link);
+            // link dst out flow into src out links
+            std::pair<Pin *, Pin *> re_link_out(dst_flow_out_pin, src_flow_out_pin->m_LinkPin);
+            relink_pairs.push_back(re_link_out);
+            // link dst input flow to src input flow
+            for (auto from_pin : dst_flow_in_pin->m_LinkFrom)
+            {
+                auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                std::pair<Pin *, Pin *> re_link_in(pin, src_flow_in_pin);
+                relink_pairs.push_back(re_link_in);
+            }
+
+            // link src out data into dst
+            for (int i = 0; i < src_data_out_pin.size(); i++)
+            {
+                if (i < dst_data_in_pin.size())
+                {
+                    std::pair<Pin *, Pin *> re_link_data(dst_data_in_pin[i], src_data_out_pin[i]);
+                    relink_pairs.push_back(re_link_data);
+                }
+            }
+
+            // link dst out data into src out data links
+            for (int i = 0; i < dst_data_out_pin.size(); i++)
+            {
+                if (i < src_data_out_pin.size())
+                {
+                    for (auto from_pin : src_data_out_pin[i]->m_LinkFrom)
+                    {
+                        auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                        std::pair<Pin *, Pin *> re_link_in(pin, dst_data_out_pin[i]);
+                        relink_pairs.push_back(re_link_in);
+                    }
+                }
+            }
+
+            // link dst input data to src input data
+            for (int i = 0; i < dst_data_in_pin.size(); i++)
+            {
+                if (i < src_data_in_pin.size())
+                {
+                    std::pair<Pin *, Pin *> re_link_in(src_data_in_pin[i], dst_data_in_pin[i]->m_LinkPin);
+                    relink_pairs.push_back(re_link_in);
+                }
+            }
+        }
+    }
+    else
+    {
+        // link src out flow into dst out link
+        std::pair<Pin *, Pin *> re_link_src(src_flow_out_pin, dst_flow_out_pin->m_LinkPin);
+        relink_pairs.push_back(re_link_src);
+        // link dst out flow into src out link
+        std::pair<Pin *, Pin *> re_link_dst(dst_flow_out_pin, src_flow_out_pin->m_LinkPin);
+        relink_pairs.push_back(re_link_dst);
+        // link src input flow to dst input flow
+        for (auto from_pin : src_flow_in_pin->m_LinkFrom)
+        {
+            auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+            std::pair<Pin *, Pin *> re_link_in(pin, dst_flow_in_pin);
+            relink_pairs.push_back(re_link_in);
+        }
+        // link dst input flow to src input flow
+        for (auto from_pin : dst_flow_in_pin->m_LinkFrom)
+        {
+            auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+            std::pair<Pin *, Pin *> re_link_in(pin, src_flow_in_pin);
+            relink_pairs.push_back(re_link_in);
+        }
+
+        // link src out data into dst out data links
+        for (int i = 0; i < src_data_out_pin.size(); i++)
+        {
+            if (i < dst_data_out_pin.size())
+            {
+                for (auto from_pin : dst_data_out_pin[i]->m_LinkFrom)
+                {
+                    auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                    std::pair<Pin *, Pin *> re_link_in(pin, src_data_out_pin[i]);
+                    relink_pairs.push_back(re_link_in);
+                }
+            }
+        }
+
+        // link dst out data into src out data links
+        for (int i = 0; i < dst_data_out_pin.size(); i++)
+        {
+            if (i < src_data_out_pin.size())
+            {
+                for (auto from_pin : src_data_out_pin[i]->m_LinkFrom)
+                {
+                    auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                    std::pair<Pin *, Pin *> re_link_in(pin, dst_data_out_pin[i]);
+                    relink_pairs.push_back(re_link_in);
+                }
+            }
+        }
+
+        // link src input data to dst input data
+        for (int i = 0; i < src_data_in_pin.size(); i++)
+        {
+            if (i < dst_data_in_pin.size())
+            {
+                std::pair<Pin *, Pin *> re_link_in(dst_data_in_pin[i], src_data_in_pin[i]->m_LinkPin);
+                relink_pairs.push_back(re_link_in);
+            }
+        }
+
+        // link dst input data to src input data
+        for (int i = 0; i < dst_data_in_pin.size(); i++)
+        {
+            if (i < src_data_in_pin.size())
+            {
+                std::pair<Pin *, Pin *> re_link_in(src_data_in_pin[i], dst_data_in_pin[i]->m_LinkPin);
+                relink_pairs.push_back(re_link_in);
+            }
+        }
+    }
+    for (auto pair : relink_pairs)
+    {
+        if (pair.first && pair.second)
+            pair.first->LinkTo(*pair.second);
+    }
+
+    ed::SetNodePosition(src->m_ID, dst_pos);
+    ed::SetNodePosition(dst->m_ID, src_pos);
+    m_Document->m_Blueprint.SwapNode(src_id, dst_id);
     return true;
 }
 

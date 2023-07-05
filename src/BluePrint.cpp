@@ -173,6 +173,22 @@ void BP::InsertNode(Node* node)
         m_Nodes.emplace_back(node);
 }
 
+void BP::SwapNode(ID_TYPE src, ID_TYPE dst)
+{
+    auto iter_src = std::find_if(m_Nodes.begin(), m_Nodes.end(), [src](Node* node) {
+        return node->m_ID == src;
+    });
+    auto iter_dst = std::find_if(m_Nodes.begin(), m_Nodes.end(), [dst](Node* node) {
+        return node->m_ID == dst;
+    });
+    if (iter_src != m_Nodes.end() && iter_dst != m_Nodes.end())
+    {
+        Node * tmp = *iter_src;
+        *iter_src = *iter_dst;
+        *iter_dst = tmp;
+    }
+}
+
 void BP::ForgetPin(Pin* pin)
 {
     auto pinIt = std::find(m_Pins.begin(), m_Pins.end(), pin);

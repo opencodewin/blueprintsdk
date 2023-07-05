@@ -295,6 +295,7 @@ struct IMGUI_API BP
     void DeleteNode(Node* node);
     Node* CloneNode(Node* node);
     void InsertNode(Node* node);
+    void SwapNode(ID_TYPE src, ID_TYPE dst);
 
     void ForgetPin(Pin* pin);
 

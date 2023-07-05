@@ -314,6 +314,7 @@ public:
 
     bool Blueprint_AppendNode(ID_TYPE id);
     ImVec2 Blueprint_EstimateNodeSize(Node* node);
+    bool Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id);
 
     Node* FindEntryPointNode();
     Node* FindExitPointNode();
