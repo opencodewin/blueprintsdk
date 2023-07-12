@@ -269,7 +269,6 @@ struct IMGUI_API Node
     bool            m_NoBackGround      {false};
     bool            m_Skippable         {false};
     bool            m_Enabled           {true};
-    bool            m_NeedUpdate        {false};
     ID_TYPE         m_GroupID           {0};
     std::mutex      m_mutex;
 

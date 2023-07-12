@@ -1323,11 +1323,6 @@ void BluePrintUI::DrawNodes()
             ed::PushStyleColor(ed::StyleColor_NodeBorder, m_StyleColors[BluePrintStyleColor_Border]);
         }
         ed::BeginNode(node->m_ID);
-        if (node->m_NeedUpdate)
-        {
-            ed::SetNodeChanged(node->m_ID);
-            node->m_NeedUpdate = false;
-        }
         // Comment/Group node layout:
         //
         // [ Comment ]                         |     [ Group ]                              |
@@ -1588,11 +1583,6 @@ void BluePrintUI::DrawNodes()
         if (node->m_NoBackGround)
             ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.f, 0.f, 0.f, 0.f));
         ed::BeginNode(node->m_ID);
-        if (node->m_NeedUpdate)
-        {
-            ed::SetNodeChanged(node->m_ID);
-            node->m_NeedUpdate = false;
-        }
         // Default node layout:                         Simple node layout:
         //
         // +-----------------------------------+         +-----------------------------------+
@@ -3942,6 +3932,21 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
     m_Document->m_Blueprint.SwapNode(src_id, dst_id);
     File_MarkModified();
     //ed::SetCurrentEditor(nullptr);
+    return true;
+}
+
+bool BluePrintUI::Blueprint_UpdateNode(ID_TYPE id)
+{
+    if (!m_Document)
+        return false;
+    if (!Blueprint_IsValid())
+        return false;
+    ed::SetCurrentEditor(m_Editor);
+    auto node = m_Document->m_Blueprint.FindNode(id);
+    if (!node)
+        return false;
+    ed::SetNodeChanged(node->m_ID);
+    ed::Update();
     return true;
 }
 
