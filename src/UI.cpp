@@ -225,7 +225,7 @@ void PinContextMenu::PinContextMenu::Show(BluePrintUI& UI)
         if (ImGui::MenuItem("Export", "", &pin->m_Exported))
         {
             ed::SetPinChanged(pin->m_ID);
-            UI.m_Document->m_IsModified = true;
+            UI.File_MarkModified();
         }
         ImGui::EndPopup();
     }
@@ -267,7 +267,7 @@ void LinkContextMenu::Show(BluePrintUI& UI)
                 for (auto selectedLink : selectedLinks)
                     ed::DeleteLink(selectedLink->m_ID);
             }
-            UI.m_Document->m_IsModified = true;
+            UI.File_MarkModified();
         }
 
         ImGui::EndPopup();
@@ -304,7 +304,7 @@ void NodeSettingDialog::Show(BluePrintUI& UI)
         ImGui::Separator();
         if (ImGui::Button("OK", ImVec2(120, 0))) 
         {
-            UI.m_Document->m_IsModified = true;
+            UI.File_MarkModified();
             ed::SetNodeChanged(node->m_ID);
             ImGui::CloseCurrentPopup();
             if (UI.m_CallBacks.BluePrintOnChanged)
@@ -344,7 +344,7 @@ void NodeDeleteDialog::Show(BluePrintUI& UI)
         if (ImGui::Button("OK", ImVec2(120, 0))) 
         {
             ed::DeleteNode(node->m_ID);
-            UI.m_Document->m_IsModified = true;
+            UI.File_MarkModified();
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
@@ -892,23 +892,28 @@ void BluePrintUI::CreateNewDocument()
 
 void BluePrintUI::CreateNewFilterDocument()
 {
+    ed::SetCurrentEditor(m_Editor);
     auto blueprint = &m_Document->m_Blueprint;
     auto entryPointNode = blueprint->CreateNode<BluePrint::FilterEntryPointNode>();
                             ed::SetNodePosition(entryPointNode->m_ID, ImVec2(32, 32));
 
     auto view_size = ed::GetViewSize();
     if (view_size.x == 0 || view_size.y == 0)
-        view_size = ImVec2(600, 200);
+    {
+        view_size = ImVec2(600, 300);
+    }
     auto exitPointNode = blueprint->CreateNode<BluePrint::MatExitPointNode>();
                             ed::SetNodePosition(exitPointNode->m_ID, view_size - ImVec2(32 + 64, 32));
     entryPointNode->m_Exit.LinkTo(exitPointNode->m_Enter);
     exitPointNode->m_MatIn.LinkTo(entryPointNode->m_MatOut);
     CommitLinksToEditor();
     blueprint->SetOpen(true);
+    //ed::SetCurrentEditor(nullptr);
 }
 
 void BluePrintUI::CreateNewTransitionDocument()
 {
+    ed::SetCurrentEditor(m_Editor);
     auto blueprint = &m_Document->m_Blueprint;
     auto entryPointNode = blueprint->CreateNode<BluePrint::TransitionEntryPointNode>();
                             ed::SetNodePosition(entryPointNode->m_ID, ImVec2(32, 32));
@@ -924,6 +929,7 @@ void BluePrintUI::CreateNewTransitionDocument()
     exitPointNode->m_MatIn.LinkTo(entryPointNode->m_MatOutFirst);
     CommitLinksToEditor();
     blueprint->SetOpen(true);
+    //ed::SetCurrentEditor(nullptr);
 }
 
 void BluePrintUI::InstallDocumentCallbacks()
@@ -2080,7 +2086,7 @@ void BluePrintUI::DrawInfoTooltip()
                             hoveredPin->m_Flags |= PIN_FLAG_PUBLICIZED;
                         }
                         ed::SetPinChanged(hoveredPin->m_ID);
-                        m_Document->m_IsModified = true;
+                        File_MarkModified();
                     }
                 }
                 pinTooltip("Pin:", hoveredPin, false);
@@ -2909,6 +2915,7 @@ void BluePrintUI::File_MarkModified()
         return;
 
     m_Document->m_IsModified = true;
+    ed::Update();
 }
 
 void BluePrintUI::InitFileDialog(const char * bookmark_path)
@@ -3116,6 +3123,7 @@ bool BluePrintUI::File_New()
     CreateNewDocument();
     m_Document->m_Name = "NONAMED";
     if (m_DebugOverlay) m_DebugOverlay->Init(&m_Document->m_Blueprint);
+    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 
@@ -3155,6 +3163,7 @@ bool BluePrintUI::File_New_Filter(imgui_json::value& bp, std::string name, std::
         m_Document->m_CatalogFilter = sfilter;
 
     if (m_DebugOverlay) m_DebugOverlay->Init(&m_Document->m_Blueprint);
+    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 
@@ -3195,6 +3204,7 @@ bool BluePrintUI::File_New_Transition(imgui_json::value& bp, std::string name, s
         m_Document->m_CatalogFilter = sfilter;
     
     if (m_DebugOverlay) m_DebugOverlay->Init(&m_Document->m_Blueprint);
+    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 
@@ -3282,7 +3292,7 @@ bool BluePrintUI::Edit_Cut()
         LOGI("[Edit]: Cut Node %s", clip.m_Name.c_str());
         ed::DeleteNode(node->m_ID);
     }
-    m_Document->m_IsModified = true;
+    File_MarkModified();
     return selectedNodes.size() > 0;
 }
 
@@ -3346,7 +3356,7 @@ bool BluePrintUI::Edit_Delete()
         ed::DeleteNode(node->m_ID);
         LOGI("[Edit]: Delete Node 0x%08" PRIX32, node->m_ID);
     }
-    m_Document->m_IsModified = true;
+    File_MarkModified();
     return selectedNodes.size() > 0;
 }
 
@@ -3359,7 +3369,7 @@ bool BluePrintUI::Edit_Unlink()
         ed::DeleteLink(selectedLink->m_ID);
         LOGI("[Edit]: Remove Link 0x%08" PRIX32, selectedLink->m_ID);
     }
-    m_Document->m_IsModified = true;
+    File_MarkModified();
     return selectedLinks.size() > 0;
 }
 
@@ -3376,9 +3386,13 @@ bool BluePrintUI::Edit_Insert(ID_TYPE id)
     ed::ClearSelection();
     auto new_node = m_Document->m_Blueprint.CreateNode(id);
     if (!new_node)
+    {
+        //ed::SetCurrentEditor(nullptr);
         return false;
+    }
     ed::SetNodePosition(new_node->m_ID, ImVec2(40, 80));
     ed::SelectNode(new_node->m_ID, true);
+    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 
@@ -3613,7 +3627,10 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
     ed::SetCurrentEditor(m_Editor);
     auto new_node = m_Document->m_Blueprint.CreateNode(id);
     if (!new_node)
+    {
+        //ed::SetCurrentEditor(nullptr);
         return false;
+    }
     
     auto exitNode = FindExitPointNode(); // must be existed, check by Blueprint_IsValid()
     BluePrint::Node* last_linked_node = nullptr;
@@ -3697,7 +3714,8 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
     {
         m_CallBacks.BluePrintOnChanged(BP_CB_NODE_APPEND, m_Document->m_Name, m_UserHandle);
     }
-    m_Document->m_IsModified = true;
+    File_MarkModified();
+    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 
@@ -3707,7 +3725,11 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
     auto src = m_Document->m_Blueprint.FindNode(src_id);
     auto dst = m_Document->m_Blueprint.FindNode(dst_id);
     if (!src || !dst)
+    {
+        //ed::SetCurrentEditor(nullptr);
         return false;
+    }
+
     auto src_pos = ed::GetNodePosition(src->m_ID);
     auto dst_pos = ed::GetNodePosition(dst->m_ID);
     vector<std::pair<Pin *, Pin *>> relink_pairs;
@@ -3919,6 +3941,8 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
     ed::SetNodePosition(src->m_ID, dst_pos);
     ed::SetNodePosition(dst->m_ID, src_pos);
     m_Document->m_Blueprint.SwapNode(src_id, dst_id);
+    File_MarkModified();
+    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 
