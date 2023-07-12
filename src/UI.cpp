@@ -2911,11 +2911,10 @@ bool BluePrintUI::File_IsModified()
 
 void BluePrintUI::File_MarkModified()
 {
+    ed::Update();
     if (m_Document->m_IsModified)
         return;
-
     m_Document->m_IsModified = true;
-    ed::Update();
 }
 
 void BluePrintUI::InitFileDialog(const char * bookmark_path)
