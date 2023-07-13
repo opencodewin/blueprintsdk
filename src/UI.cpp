@@ -1920,6 +1920,7 @@ void BluePrintUI::DrawInfoTooltip()
                 }
                 ImGui::TextUnformatted("    Data type:"); ImGui::SameLine(); ImGui::Text("%s", mat.type == IM_DT_INT8 ? "Int8" :
                                                 mat.type == IM_DT_INT16 ? "Int16" :
+                                                mat.type == IM_DT_INT16_BE ? "Int16BE" :
                                                 mat.type == IM_DT_INT32 ? "Int32" :
                                                 mat.type == IM_DT_INT64 ? "Int64" :
                                                 mat.type == IM_DT_FLOAT16 ? "Float 16" : 
