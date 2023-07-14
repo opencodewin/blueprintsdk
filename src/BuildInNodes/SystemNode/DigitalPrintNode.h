@@ -38,7 +38,7 @@ struct PrintNode final : Node
 
     FlowPin Execute(Context& context, FlowPin& entryPoint, bool threading = false) override
     {
-        m_string = context.GetPinValue<string>(m_String);
+        m_string = context.GetPinValue<std::string>(m_String);
         if (!m_print_to_layout)
         {
             if (s_PrintFunction)
@@ -181,6 +181,6 @@ struct PrintNode final : Node
     bool    m_custom_layout         {false};
     bool    m_print_to_layout       {false};
     bool    m_tube_digital          {true};
-    string  m_string;
+    std::string  m_string;
 };
 } // namespace BluePrint

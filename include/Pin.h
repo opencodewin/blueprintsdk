@@ -471,14 +471,14 @@ struct IMGUI_API StringPin final : Pin
 {
     static constexpr auto TypeId = PinType::String;
 
-    StringPin(Node* node, string value = ""): Pin(node, PinType::String), m_Value(value) {}
-    StringPin(Node* node, std::string name, string value = ""): Pin(node, PinType::String, name), m_Value(value) {}
+    StringPin(Node* node, std::string value = ""): Pin(node, PinType::String), m_Value(value) {}
+    StringPin(Node* node, std::string name, std::string value = ""): Pin(node, PinType::String, name), m_Value(value) {}
 
     bool SetValue(const PinValue& value) override
     {
         if (value.GetType() != TypeId)
             return false;
-        m_Value = value.As<string>();
+        m_Value = value.As<std::string>();
         return true;
     }
 
@@ -487,7 +487,7 @@ struct IMGUI_API StringPin final : Pin
     bool Load(const imgui_json::value& value) override;
     void Save(imgui_json::value& value, std::map<ID_TYPE, ID_TYPE> MapID = {}) const override;
 
-    string m_Value;
+    std::string m_Value;
 };
 
 // Point type pin
