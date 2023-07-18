@@ -3635,14 +3635,17 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
         for (auto link_id : exit_flow_pin->m_LinkFrom)
         {
             auto link_pin = m_Document->m_Blueprint.GetPinFromID(link_id);
-            // re-link prev node flow to new_node
-            if (new_flow_in_pin)
+            if (link_pin)
             {
-                link_pin->LinkTo(*new_flow_in_pin);
-            }
-            if (!last_linked_node)
-            {
-                last_linked_node = link_pin->m_Node;
+                // re-link prev node flow to new_node
+                if (new_flow_in_pin)
+                {
+                    link_pin->LinkTo(*new_flow_in_pin);
+                }
+                if (!last_linked_node)
+                {
+                    last_linked_node = link_pin->m_Node;
+                }
             }
         }
         // re-link new node flow to exitPoint node
@@ -3942,6 +3945,57 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
     File_MarkModified();
     //ed::SetCurrentEditor(nullptr);
     return true;
+}
+
+bool BluePrintUI::Blueprint_DeleteNode(ID_TYPE id)
+{
+    if (!m_Document)
+        return false;
+    if (!Blueprint_IsValid())
+        return false;
+    ed::SetCurrentEditor(m_Editor);
+    auto result = ed::DeleteNode(id);
+    if (result)
+    {
+        //HandleDestroyAction();
+        auto node = m_Document->m_Blueprint.FindNode(id);
+        if (node && node->GetStyle() != NodeStyle::Group)
+        {
+            vector<std::pair<Pin *, Pin *>> relink_pairs;
+            node->OnNodeDelete();
+            if (m_CallBacks.BluePrintOnChanged)
+            {
+                auto ret = m_CallBacks.BluePrintOnChanged(BP_CB_NODE_DELETED, m_Document->m_Name, m_UserHandle);
+                if (ret == BP_CBR_AutoLink)
+                {
+                    HandleAutoLink(node, relink_pairs);
+                }
+            }
+            // unlink flow out pin
+            for (auto pin : node->GetOutputPins())
+            {
+                if (pin->GetType() == PinType::Flow) pin->Unlink();
+            }
+            // unlink data in pin
+            for (auto pin : node->GetInputPins())
+            {
+                if (pin->GetType() != PinType::Flow)pin->Unlink();
+            }
+            // delete node from blueprint
+            m_Document->m_Blueprint.DeleteNode(node);
+            // Check if we have re-link pin
+            for (auto pair : relink_pairs)
+            {
+                pair.first->LinkTo(*pair.second);
+                if (m_CallBacks.BluePrintOnChanged)
+                {
+                    auto ret = m_CallBacks.BluePrintOnChanged(BP_CB_Link, m_Document->m_Name, m_UserHandle);
+                }
+            }
+        }
+        File_MarkModified();
+    }
+    return result;
 }
 
 bool BluePrintUI::Blueprint_UpdateNode(ID_TYPE id)

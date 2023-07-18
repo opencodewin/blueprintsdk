@@ -143,6 +143,7 @@ void BP::DeleteNode(Node* node)
         }
     }
 
+    
     delete *nodeIt;
 
     m_Nodes.erase(nodeIt);

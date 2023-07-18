@@ -313,8 +313,9 @@ public:
     bool Blueprint_BreakPoint();
 
     bool Blueprint_AppendNode(ID_TYPE id);
-    ImVec2 Blueprint_EstimateNodeSize(Node* node);
+    bool Blueprint_DeleteNode(ID_TYPE id);
     bool Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id);
+    ImVec2 Blueprint_EstimateNodeSize(Node* node);
     bool Blueprint_UpdateNode(ID_TYPE id);
 
     Node* FindEntryPointNode();
