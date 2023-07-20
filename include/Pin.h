@@ -170,9 +170,6 @@ struct IMGUI_API Pin
 
     // For Bridge/Shadow Pin
     ID_TYPE         m_MappedPin {static_cast<ID_TYPE>(0)};
-
-    // link pin point for opt
-    Pin *    m_LinkPin {nullptr};
 };
 
 template<class T>

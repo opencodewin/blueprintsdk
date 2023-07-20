@@ -119,7 +119,6 @@ bool Pin::LinkTo(Pin& pin)
         Unlink();
 
     m_Link = pin.m_ID;
-    m_LinkPin = &pin;
 
     m_Node->WasLinked(*this, pin);
     pin.m_Node->WasLinked(*this, pin);
@@ -146,7 +145,6 @@ void Pin::Unlink()
         return;
 
     m_Link = 0;
-    m_LinkPin = nullptr;
 
     m_Node->WasUnlinked(*this, *link);
     link->m_Node->WasUnlinked(*this, *link);
@@ -182,9 +180,6 @@ Pin* Pin::GetLink(const BP *bp) const
     if (!m_Link)
         return nullptr;
     
-    if (m_LinkPin)
-        return m_LinkPin;
-
     auto blueprint = bp;
     if (!bp)
         blueprint = m_Node->m_Blueprint;
