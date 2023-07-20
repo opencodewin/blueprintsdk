@@ -3473,7 +3473,7 @@ bool BluePrintUI::Blueprint_SetFilter(const std::string name, const PinValue& va
     return false;
 }
 
-bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output)
+bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output, int64_t current, int64_t duration)
 {
     if (!Blueprint_IsValid())
         return false;
@@ -3482,6 +3482,8 @@ bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output)
     if (!entry_node || !exit_node)
         return false;
     
+    m_Document->m_Blueprint.SetTimeStamp(current);
+    m_Document->m_Blueprint.SetDurtion(duration);
     FilterEntryPointNode * entryNode = (FilterEntryPointNode *)entry_node;
     MatExitPointNode * exitNode = (MatExitPointNode *)exit_node;
     entryNode->m_MatOut.SetValue(input);
@@ -3525,6 +3527,8 @@ bool BluePrintUI::Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMa
     if (!entry_node || !exit_node)
         return false;
     
+    m_Document->m_Blueprint.SetTimeStamp(current);
+    m_Document->m_Blueprint.SetDurtion(duration);
     TransitionEntryPointNode * entryNode = (TransitionEntryPointNode *)entry_node;
     MatExitPointNode * exitNode = (MatExitPointNode *)exit_node;
     float progress = (float)current / (float)duration;

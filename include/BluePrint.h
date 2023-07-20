@@ -363,6 +363,11 @@ struct IMGUI_API BP
     Pin * GetPinFromID(ID_TYPE pinid);
     const Pin * GetPinFromID(ID_TYPE pinid) const;
 
+    void SetTimeStamp(int64_t time_stamp) { m_TimeStamp = time_stamp; }
+    void SetDurtion(int64_t durtion) { m_Duration = durtion; }
+    int64_t GetTimeStamp() { return m_TimeStamp; }
+    int64_t GetDurtion() { return m_Duration; }
+
     std::vector<Pin*> FindPinsLinkedTo(const Pin& pin) const;
 
     void OnContextRunDone();
@@ -385,6 +390,10 @@ private:
     Context                         m_Context;
     bool                            m_StyleLight {false};
     bool                            m_IsOpen {false};
+
+    // Node Time info
+    int64_t                         m_TimeStamp {-1};
+    int64_t                         m_Duration {-1};
 };
 # pragma endregion
 
