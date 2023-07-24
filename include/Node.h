@@ -254,7 +254,7 @@ struct IMGUI_API Node
 
     virtual void DrawSettingLayout(ImGuiContext * ctx);
     virtual void DrawMenuLayout(ImGuiContext * ctx);
-    virtual bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::keys * key = nullptr);
+    virtual bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::keys * key = nullptr, bool embedded = true);
     virtual void DrawNodeLogo(ImGuiContext * ctx, ImVec2 size, std::string logo = std::string(ICON_NODE)) const;
     virtual void DrawNodeLogo(ImTextureID logo, int& index, int cols, int rows, ImVec2 size) const;
     virtual ImTextureID LoadNodeLogo(void * data, int size) const;
@@ -264,7 +264,6 @@ struct IMGUI_API Node
     BP*             m_Blueprint         {nullptr};
     int             m_IconHovered       {-1};
     bool            m_HasSetting        {false};
-    bool            m_HasCustomLayout   {false};
     bool            m_BreakPoint        {false};
     bool            m_NoBackGround      {false};
     bool            m_Skippable         {false};
@@ -289,7 +288,6 @@ struct ClipNode
         m_GroupSize = ed::GetGroupSize(node->m_ID);
         m_HasSetting = node->m_HasSetting;
         m_Skippable = node->m_Skippable;
-        m_HasCustomLayout = node->m_HasCustomLayout;
     }
 
     NodeTypeInfo    m_NodeInfo;
@@ -299,7 +297,6 @@ struct ClipNode
     string          m_Name              {""};
     bool            m_HasSetting        {false};
     bool            m_Skippable         {false};
-    bool            m_HasCustomLayout   {false};
 };
 
 struct IMGUI_API NodeRegistry
