@@ -3608,20 +3608,20 @@ bool BluePrintUI::Blueprint_BreakPoint()
     return true;
 }
 
-bool BluePrintUI::Blueprint_AppendNode(ID_TYPE id)
+bool BluePrintUI::Blueprint_AppendNode(ID_TYPE type_id, ID_TYPE* node_id)
 {
     if (!m_Document)
         return false;
     if (!Blueprint_IsValid())
         return false;
     ed::SetCurrentEditor(m_Editor);
-    auto new_node = m_Document->m_Blueprint.CreateNode(id);
+    auto new_node = m_Document->m_Blueprint.CreateNode(type_id);
     if (!new_node)
     {
         //ed::SetCurrentEditor(nullptr);
         return false;
     }
-    
+    if (node_id) *node_id = new_node->m_ID;
     auto exitNode = FindExitPointNode(); // must be existed, check by Blueprint_IsValid()
     BluePrint::Node* last_linked_node = nullptr;
     auto exit_flow_pin = exitNode->GetAutoLinkInputFlowPin();
