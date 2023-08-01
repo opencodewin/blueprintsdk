@@ -193,6 +193,7 @@ enum BluePrintCallBack:int
     BP_CB_NODE_DELETED,
     BP_CB_PARAM_CHANGED,
     BP_CB_SETTING_CHANGED,
+    BP_CB_OPERATION_DONE,
     BP_CB_Custom,
 };
 
@@ -233,6 +234,7 @@ struct BluePrintUI
     ed::Config                      m_Config;
     ed::EditorContext*              m_Editor {nullptr};
     unique_ptr<Document>            m_Document {nullptr};
+    imgui_json::value               m_OpRecord;
     ImGuiFileDialog                 m_FileDialog;
     std::string                     m_BookMarkPath;
     std::vector<ClipNode>           m_ClipBoard;
@@ -317,6 +319,7 @@ public:
     bool Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id);
     ImVec2 Blueprint_EstimateNodeSize(Node* node);
     bool Blueprint_UpdateNode(ID_TYPE id);
+    imgui_json::value Blueprint_GetOpRecord() const;
 
     Node* FindEntryPointNode();
     Node* FindExitPointNode();
@@ -371,6 +374,9 @@ private:
     void                HandleDestroyAction();
     void                HandleContextMenuAction(uint32_t flag = BluePrintFlag::BluePrintFlag_All);
     void                InitFileDialog(const char * bookmark_path = nullptr);
+    void                BeginOpRecord(const std::string& opName);
+    void                EndOpRecord();
+    void                ClearOpRecord();
 
 private:
     void                CreateNewDocument();

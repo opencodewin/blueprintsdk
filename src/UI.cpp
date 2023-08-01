@@ -874,6 +874,8 @@ bool BluePrintUI::Frame(bool child_window, bool show_node, bool bp_enabled, uint
         FileDialogs();
         ed::SetCurrentEditor(nullptr);
     }
+
+    EndOpRecord();
     return done;
 }
 
@@ -2397,6 +2399,7 @@ Node* BluePrintUI::ShowNewNodeMenu(ImVec2 popupPosition, std::string catalog_fil
         if (ImGui::MenuItem(menu_label.c_str(), nullptr, false, true, nodetype->m_Type == NodeType::External ? ICON_NODE_DLL : nullptr))
         {
             auto transaction = m_Document->BeginUndoTransaction("CreateNode");
+            BeginOpRecord("CreateNode");
             node = m_Document->m_Blueprint.CreateNode(nodetype->m_ID);
             LOGI("[NodeCreate] %" PRI_node " created", FMT_node(node));
             if (popupPosition.x == 0 || popupPosition.y == 0)
@@ -2740,6 +2743,8 @@ void BluePrintUI::HandleDestroyAction()
     ItemDeleter itemDeleter;
     if (!itemDeleter)
         return;
+    bool validDeletion = false;
+
     auto deferredTransaction = m_Document->GetDeferredUndoTransaction("Destroy Action");
     vector<Node*> nodesToDelete;
     uint32_t brokenLinkCount = 0;
@@ -2764,6 +2769,7 @@ void BluePrintUI::HandleDestroyAction()
             }
             // Queue nodes for deletion. We need to serve links first to avoid crash.
             nodesToDelete.push_back(node);
+            validDeletion = true;
         }
     }
     // Process all links marked for deletion
@@ -2786,6 +2792,7 @@ void BluePrintUI::HandleDestroyAction()
                         auto ret = m_CallBacks.BluePrintOnChanged(BP_CB_Unlink, m_Document->m_Name, m_UserHandle);
                     }
                     ++brokenLinkCount;
+                    validDeletion = true;
                 }
             }
         }
@@ -2812,6 +2819,9 @@ void BluePrintUI::HandleDestroyAction()
             auto ret = m_CallBacks.BluePrintOnChanged(BP_CB_Link, m_Document->m_Name, m_UserHandle);
         }
     }
+    // discard this OpRecord if nothing is actually deleted
+    if (validDeletion)
+        BeginOpRecord("DestroyAction");
 }
 
 void BluePrintUI::HandleContextMenuAction(uint32_t flag)
@@ -3621,6 +3631,8 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE type_id, ID_TYPE* node_id)
         //ed::SetCurrentEditor(nullptr);
         return false;
     }
+    BeginOpRecord("AppendNode");
+
     if (node_id) *node_id = new_node->m_ID;
     auto exitNode = FindExitPointNode(); // must be existed, check by Blueprint_IsValid()
     BluePrint::Node* last_linked_node = nullptr;
@@ -3709,6 +3721,7 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE type_id, ID_TYPE* node_id)
     }
     File_MarkModified();
     //ed::SetCurrentEditor(nullptr);
+    EndOpRecord();
     return true;
 }
 
@@ -3722,6 +3735,7 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
         //ed::SetCurrentEditor(nullptr);
         return false;
     }
+    BeginOpRecord("SwapNode");
 
     auto src_pos = ed::GetNodePosition(src->m_ID);
     auto dst_pos = ed::GetNodePosition(dst->m_ID);
@@ -3944,6 +3958,7 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
     m_Document->m_Blueprint.SwapNode(src_id, dst_id);
     File_MarkModified();
     //ed::SetCurrentEditor(nullptr);
+    EndOpRecord();
     return true;
 }
 
@@ -3953,6 +3968,7 @@ bool BluePrintUI::Blueprint_DeleteNode(ID_TYPE id)
         return false;
     if (!Blueprint_IsValid())
         return false;
+    BeginOpRecord("DeleteNode");
     ed::SetCurrentEditor(m_Editor);
     auto result = ed::DeleteNode(id);
     if (result)
@@ -3995,6 +4011,7 @@ bool BluePrintUI::Blueprint_DeleteNode(ID_TYPE id)
         }
         File_MarkModified();
     }
+    EndOpRecord();
     return result;
 }
 
@@ -4011,6 +4028,11 @@ bool BluePrintUI::Blueprint_UpdateNode(ID_TYPE id)
     ed::SetNodeChanged(node->m_ID);
     ed::Update();
     return true;
+}
+
+imgui_json::value BluePrintUI::Blueprint_GetOpRecord() const
+{
+    return m_OpRecord;
 }
 
 bool BluePrintUI::File_Export(Node * group_node)
@@ -4436,5 +4458,37 @@ void BluePrintUI::Thumbnails(float view_expand, ImVec2 size, ImVec2 pos)
     ImGui::End();
     m_ThumbnailShowCount --;
     if (m_ThumbnailShowCount <= 0) m_ThumbnailShowCount = 0;
+}
+
+void BluePrintUI::BeginOpRecord(const std::string& opName)
+{
+    if (m_OpRecord.contains("operation"))
+    {
+        std::ostringstream oss;
+        oss << m_OpRecord["operation"].get<imgui_json::string>() << "|" << opName;
+        m_OpRecord["operation"] = oss.str();
+    }
+    else
+    {
+        m_OpRecord["operation"] = opName;
+        m_OpRecord["before_op_state"] = m_Document->Serialize();
+    }
+}
+
+void BluePrintUI::EndOpRecord()
+{
+    if (!m_OpRecord.contains("operation"))
+        return;
+    if (m_CallBacks.BluePrintOnChanged)
+    {
+        m_OpRecord["after_op_state"] = m_Document->Serialize();
+        m_CallBacks.BluePrintOnChanged(BP_CB_OPERATION_DONE, m_Document->m_Name, m_UserHandle);
+    }
+    m_OpRecord = imgui_json::value();
+}
+
+void BluePrintUI::ClearOpRecord()
+{
+    m_OpRecord = imgui_json::value();
 }
 } // namespace BluePrint
