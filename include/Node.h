@@ -349,3 +349,4 @@ namespace BluePrint
     }
 }// namespace BluePrint
 
+#define IS_ENTRY_EXIT_NODE(type) (type == BluePrint::NodeType::EntryPoint || type == BluePrint::NodeType::ExitPoint)
