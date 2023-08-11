@@ -1,0 +1,16 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+.DS_Store 
+*build*
+config/*
+projects/*
+.vscode/
+.cache/
+/output
+/plugins
+*.ini
+*.node
+*.cfg
+*.json
+*.mep
+*.mp4
+*.mov
