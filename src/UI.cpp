@@ -2719,19 +2719,24 @@ void BluePrintUI::HandleAutoLink(Node *node, vector<std::pair<Pin *, Pin *>>& re
 
 void BluePrintUI::HandleAutoLink(Node *node, Node* input_node, Node* output_node)
 {
-    // link input pin
-    auto input_flow_pin = input_node->GetAutoLinkOutputFlowPin();
-    auto current_input_flow_pin = node->GetAutoLinkInputFlowPin();
-    if (input_flow_pin && current_input_flow_pin)
+    if (!node)
+        return;
+    if (input_node)
     {
-        input_flow_pin->LinkTo(*current_input_flow_pin);
-    }
-    auto input_data_pin = input_node->GetAutoLinkOutputDataPin();
-    auto current_input_data_pin = node->GetAutoLinkInputDataPin();
-    int link_num = ImMin(input_data_pin.size(), current_input_data_pin.size());
-    for (int i = 0; i < link_num; i++)
-    {
-        current_input_data_pin[i]->LinkTo(*input_data_pin[i]);
+        // link input pin
+        auto input_flow_pin = input_node->GetAutoLinkOutputFlowPin();
+        auto current_input_flow_pin = node->GetAutoLinkInputFlowPin();
+        if (input_flow_pin && current_input_flow_pin)
+        {
+            input_flow_pin->LinkTo(*current_input_flow_pin);
+        }
+        auto input_data_pin = input_node->GetAutoLinkOutputDataPin();
+        auto current_input_data_pin = node->GetAutoLinkInputDataPin();
+        int link_num = ImMin(input_data_pin.size(), current_input_data_pin.size());
+        for (int i = 0; i < link_num; i++)
+        {
+            current_input_data_pin[i]->LinkTo(*input_data_pin[i]);
+        }
     }
     // link output pin
     if (output_node)
