@@ -435,50 +435,33 @@ void NodeCreateDialog::Show(BluePrintUI& UI)
         m_CreatedLinks.clear();
         if (fromPin)
         {
-            auto newLinks = CreateLinkToFirstMatchingPin(*node, *fromPin);
-            for (auto startPin : newLinks)
+            // find linked input node
+            Node* input_node =  fromPin->m_Node;
+            // find linked output node
+            Node* output_node = nullptr;
+            if (fromPin->GetType() == PinType::Flow)
             {
-                LOGI("[NodeCreateDialog] %" PRI_pin "  linked with %" PRI_pin, FMT_pin(startPin), FMT_pin(startPin->GetLink()));
-                if (UI.m_CallBacks.BluePrintOnChanged)
+                Pin* linked_pin = fromPin->GetLink(&UI.m_Document->m_Blueprint);
+                if (linked_pin) output_node = linked_pin->m_Node;
+            }
+            else if (!fromPin->m_LinkFrom.empty())
+            {
+                Pin* linked_pin = UI.m_Document->m_Blueprint.GetPinFromID(fromPin->m_LinkFrom[0]);
+                if (linked_pin) output_node = linked_pin->m_Node;
+            }
+
+            if (UI.m_CallBacks.BluePrintOnChanged)
+            {
+                auto ret = UI.m_CallBacks.BluePrintOnChanged(BP_CB_NODE_INSERT, UI.m_Document->m_Name, UI.m_UserHandle);
+                if (ret == BP_CBR_AutoLink)
                 {
-                    auto ret = UI.m_CallBacks.BluePrintOnChanged(BP_CB_Link, UI.m_Document->m_Name, UI.m_UserHandle);
-                    if (startPin->m_Type == PinType::Flow && ret == BP_CBR_AutoLink)
-                    {
-                        auto out_pin = startPin->m_Node->GetAutoLinkOutputDataPin();
-                        auto in_pin = startPin->GetLink()->m_Node->GetAutoLinkInputDataPin();
-                        if (in_pin.size() > 0 && out_pin.size() > 0 && in_pin.size() == out_pin.size())
-                        {
-                            for (int i = 0; i < in_pin.size(); i++)
-                            {
-                                in_pin[i]->LinkTo(*out_pin[i]);
-                            }
-                        }
-                    }
+                    UI.HandleAutoLink(node, input_node, output_node);
                 }
             }
         }
         ed::SetNodeChanged(node->m_ID);
     }
     ImGui::EndPopup();
-}
-
-std::vector<Pin*> NodeCreateDialog::CreateLinkToFirstMatchingPin(Node& node, Pin& fromPin)
-{
-    for (auto nodePin : node.GetInputPins())
-    {
-        if (nodePin->LinkTo(fromPin))
-            return { nodePin };
-        if (fromPin.LinkTo(*nodePin))
-            return { &fromPin };
-    }
-    for (auto nodePin : node.GetOutputPins())
-    {
-        if (nodePin->LinkTo(fromPin))
-            return { nodePin };
-        if (fromPin.LinkTo(*nodePin))
-            return { &fromPin };
-    }
-    return {};
 }
 } // namespace BluePrint
 
@@ -2712,28 +2695,61 @@ void BluePrintUI::HandleAutoLink(Node *node, vector<std::pair<Pin *, Pin *>>& re
         }
     }
     // Check data pin relink pair 
-    if (in_data_pin.size() > 0 && out_data_pin.size() > 0 && in_data_pin.size() == out_data_pin.size())
+    int pair_num = ImMin(in_data_pin.size(), out_data_pin.size());
+    for (int i = 0; i < pair_num; i++)
     {
-        for (int i = 0; i < in_data_pin.size(); i++)
+        auto in_pin = in_data_pin[i];
+        auto out_pin = out_data_pin[i];
+        if (in_pin->m_Link && out_pin->m_LinkFrom.size() > 0)
         {
-            auto in_pin = in_data_pin[i];
-            auto out_pin = out_data_pin[i];
-            if (in_pin->m_Link && out_pin->m_LinkFrom.size() > 0)
+            for (auto from_pin : out_pin->m_LinkFrom)
             {
-                for (auto from_pin : out_pin->m_LinkFrom)
+                std::pair<Pin *, Pin *> re_link;
+                auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
+                auto link_pin = m_Document->m_Blueprint.GetPinFromID(in_pin->m_Link);
+                if (pin && link_pin)
                 {
-                    std::pair<Pin *, Pin *> re_link;
-                    auto pin = m_Document->m_Blueprint.GetPinFromID(from_pin);
-                    auto link_pin = m_Document->m_Blueprint.GetPinFromID(in_pin->m_Link);
-                    if (pin && link_pin)
-                    {
-                        std::pair<Pin *, Pin *> re_link(pin, link_pin);
-                        relink_pairs.push_back(re_link);
-                    }
+                    std::pair<Pin *, Pin *> re_link(pin, link_pin);
+                    relink_pairs.push_back(re_link);
                 }
             }
         }
     }
+}
+
+void BluePrintUI::HandleAutoLink(Node *node, Node* input_node, Node* output_node)
+{
+    // link input pin
+    auto input_flow_pin = input_node->GetAutoLinkOutputFlowPin();
+    auto current_input_flow_pin = node->GetAutoLinkInputFlowPin();
+    if (input_flow_pin && current_input_flow_pin)
+    {
+        input_flow_pin->LinkTo(*current_input_flow_pin);
+    }
+    auto input_data_pin = input_node->GetAutoLinkOutputDataPin();
+    auto current_input_data_pin = node->GetAutoLinkInputDataPin();
+    int link_num = ImMin(input_data_pin.size(), current_input_data_pin.size());
+    for (int i = 0; i < link_num; i++)
+    {
+        current_input_data_pin[i]->LinkTo(*input_data_pin[i]);
+    }
+    // link output pin
+    if (output_node)
+    {
+        auto current_out_flow_pin = node->GetAutoLinkOutputFlowPin();
+        auto output_flow_pin = output_node->GetAutoLinkInputFlowPin();
+        if (current_out_flow_pin && output_flow_pin)
+        {
+            current_out_flow_pin->LinkTo(*output_flow_pin);
+        }
+        auto current_out_data_pin = node->GetAutoLinkOutputDataPin();
+        auto output_data_pin = output_node->GetAutoLinkInputDataPin();
+        int link_num = ImMin(current_out_data_pin.size(), output_data_pin.size());
+        for (int i = 0; i < link_num; i++)
+        {
+            output_data_pin[i]->LinkTo(*current_out_data_pin[i]);
+        }
+    }   
 }
 
 void BluePrintUI::HandleDestroyAction()
@@ -3383,12 +3399,63 @@ bool BluePrintUI::Edit_Insert(ID_TYPE id)
     auto new_node = m_Document->m_Blueprint.CreateNode(id);
     if (!new_node)
     {
-        //ed::SetCurrentEditor(nullptr);
         return false;
     }
-    ed::SetNodePosition(new_node->m_ID, ImVec2(40, 80));
+
+    ImVec2 node_pos = ImVec2(40, 80);
+    auto ret = m_CallBacks.BluePrintOnChanged(BP_CB_NODE_INSERT, m_Document->m_Name, m_UserHandle);
+    if (ret == BP_CBR_AutoLink)
+    {
+        auto hoveredNode = m_Document->m_Blueprint.FindNode(static_cast<ID_TYPE>(ed::GetHoveredNode().Get()));
+        auto hoveredPin  = m_Document->m_Blueprint.FindPin(static_cast<ID_TYPE>(ed::GetHoveredPin().Get()));
+        auto hoveredLink = m_Document->m_Blueprint.FindPin(static_cast<ID_TYPE>(ed::GetHoveredLink().Get()));
+        Node* input_node = nullptr;
+        Node* output_node = nullptr;
+        if (hoveredNode)
+        {
+            input_node = hoveredNode;
+            auto fromPin = input_node->GetAutoLinkOutputFlowPin();
+            if (fromPin)
+            {
+                Pin* linked_pin = fromPin->GetLink(&m_Document->m_Blueprint);
+                if (linked_pin) output_node = linked_pin->m_Node;
+            }
+        }
+        else if (hoveredPin || hoveredLink)
+        {
+            auto fromPin = hoveredPin ? hoveredPin : hoveredLink;
+            input_node = fromPin->m_Node;
+            if (fromPin->GetType() == PinType::Flow)
+            {
+                Pin* linked_pin = fromPin->GetLink(&m_Document->m_Blueprint);
+                if (linked_pin) output_node = linked_pin->m_Node;
+            }
+            else if (!fromPin->m_LinkFrom.empty())
+            {
+                Pin* linked_pin = m_Document->m_Blueprint.GetPinFromID(fromPin->m_LinkFrom[0]);
+                if (linked_pin) output_node = linked_pin->m_Node;
+            }
+            else if (fromPin->m_Link)
+            {
+                output_node = fromPin->m_Node;
+                Pin* linked_pin = m_Document->m_Blueprint.GetPinFromID(fromPin->m_Link);
+                if (linked_pin) input_node = linked_pin->m_Node;
+            }
+
+        }
+        HandleAutoLink(new_node, input_node, output_node);
+        if (input_node)
+        {
+            auto _pos = ed::GetNodePosition(input_node->m_ID);
+            auto _size = Blueprint_EstimateNodeSize(input_node);
+            _size.x = _size.x > 0 ? _size.x : 350;
+            node_pos.x = _pos.x + _size.x + 100;
+            node_pos.y = _pos.y + 50;
+        }
+    }
+
+    ed::SetNodePosition(new_node->m_ID, node_pos);
     ed::SelectNode(new_node->m_ID, true);
-    //ed::SetCurrentEditor(nullptr);
     return true;
 }
 

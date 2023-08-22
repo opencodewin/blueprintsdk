@@ -170,7 +170,6 @@ struct NodeCreateDialog
     span<const Pin* const> GetCreatedLinks() const { return make_span(const_cast<const Pin* const*>(m_CreatedLinks.data()), m_CreatedLinks.size()); }
 
 private:
-    vector<Pin*> CreateLinkToFirstMatchingPin(Node& node, Pin& fromPin);
 
     Node*           m_CreatedNode = nullptr;
     vector<Pin*>    m_CreatedLinks;
@@ -329,6 +328,9 @@ public:
     bool Blueprint_SetTransition(const std::string name, const PinValue& value);
     bool Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration);
 
+    void HandleAutoLink(Node *node, vector<std::pair<Pin *, Pin *>>& relink_pairs);
+    void HandleAutoLink(Node *node, Node* input_node, Node* output_node);
+
     Action m_File_Open       = { "Open...",         ICON_OPEN_BLUEPRINT,   [this] { File_Open();        } };
     Action m_File_Import     = { "Import...",       ICON_IMPORT_GROUP,     [this] { File_Import();      } };
     Action m_File_New        = { "New",             ICON_NEW_BLUEPRINT,    [this] { File_New();         } };
@@ -369,7 +371,6 @@ private:
     void                DrawInfoTooltip();
     void                ShowDialogs();
     void                FileDialogs();
-    void                HandleAutoLink(Node *node, vector<std::pair<Pin *, Pin *>>& relink_pairs);
     void                HandleCreateAction(uint32_t flag = BluePrintFlag::BluePrintFlag_All);
     void                HandleDestroyAction();
     void                HandleContextMenuAction(uint32_t flag = BluePrintFlag::BluePrintFlag_All);
