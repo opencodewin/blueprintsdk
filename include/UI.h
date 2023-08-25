@@ -42,6 +42,7 @@
 #define ICON_NODE_ENABLE        u8"\ue8f4"
 #define ICON_NODE_DISABLE       u8"\ue8f5"
 #define ICON_RESET              u8"\ue042"
+#define ICON_RESET_ALL          u8"\ue627"
 #define ICON_THUMBNAIL          u8"\ue8d9"
 #else
 #define ICON_OPEN_BLUEPRINT     "Open"
@@ -68,7 +69,8 @@
 #define ICON_NODE_CLEAR         "x"
 #define ICON_NODE_SEARCH        "f"
 #define ICON_NODE_NEXT          ">"
-#define ICON_RESET              "R"
+#define ICON_RESET              "r"
+#define ICON_RESET_ALL          "R"
 #define ICON_THUMBNAIL          "N"
 #endif
 
