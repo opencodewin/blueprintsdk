@@ -419,7 +419,7 @@ ItemBuilder::ItemBuilder()
 
 ItemBuilder::~ItemBuilder()
 {
-    ed::EndCreate();
+    if(m_InCreate) ed::EndCreate();
 }
 
 ItemBuilder::operator bool() const
