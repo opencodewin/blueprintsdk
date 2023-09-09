@@ -1594,7 +1594,7 @@ void BluePrintUI::DrawNodes()
                 itemMin.y = itemMin.y + border - 0.5f;
                 itemMax.x = nodeStart.x + nodeSize.x - border + 0.5f;
                 itemMax.y = itemMax.y + ImGui::GetStyle().ItemSpacing.y + 0.5f;
-                drawList->AddRectFilled(itemMin, itemMax, ImColor(isDummy ? m_StyleColors[BluePrintStyleColor_TitleBgDummy] : m_StyleColors[BluePrintStyleColor_TitleBg]), rounding, ImDrawCornerFlags_Top);
+                drawList->AddRectFilled(itemMin, itemMax, ImColor(isDummy ? m_StyleColors[BluePrintStyleColor_TitleBgDummy] : m_StyleColors[BluePrintStyleColor_TitleBg]), rounding, ImDrawFlags_RoundCornersTop & (ImDrawFlags_RoundCornersLeft | ImDrawFlags_RoundCornersRight));
                 auto size = ImVec2(8.0f, 8.0f);
                 auto pos = itemMin + ImVec2(6, (itemMax.y - itemMin.y) / 2 - size.y / 2);
                 if (ImGui::BulletToggleButton("##set_break_point", &node->m_BreakPoint, pos, size))
