@@ -69,7 +69,7 @@ struct LinkQueryResult;
 struct FlowPin;
 struct PinValue
 {
-    using ValueType = nonstd::variant<nonstd::monostate, FlowPin*, bool, int32_t, int64_t, float, double, std::string, uintptr_t, ImVec2, ImVec4, ImGui::ImMat, imgui_json::array, PinValueEx*>;
+    using ValueType = variant<monostate, FlowPin*, bool, int32_t, int64_t, float, double, std::string, uintptr_t, ImVec2, ImVec4, ImGui::ImMat, imgui_json::array, PinValueEx*>;
 
     PinValue() = default;
     PinValue(const PinValue&) = default;
