@@ -254,7 +254,7 @@ struct IMGUI_API Node
 
     virtual void DrawSettingLayout(ImGuiContext * ctx);
     virtual void DrawMenuLayout(ImGuiContext * ctx);
-    virtual bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::keys * key = nullptr, bool embedded = true);
+    virtual bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key = nullptr, bool embedded = true);
     virtual void DrawNodeLogo(ImGuiContext * ctx, ImVec2 size, std::string logo = std::string(ICON_NODE)) const;
     virtual void DrawNodeLogo(ImTextureID logo, int& index, int cols, int rows, ImVec2 size) const;
     virtual ImTextureID LoadNodeLogo(void * data, int size) const;

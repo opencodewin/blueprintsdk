@@ -546,7 +546,7 @@ void Node::DrawNodeLogo(ImTextureID logo, int& index, int cols, int rows, ImVec2
     index++; if (index >= cols * rows * 4) index = 0;
 }
 
-bool Node::DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::keys * key, bool embedded)
+bool Node::DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key, bool embedded)
 {
     return false;
 }
