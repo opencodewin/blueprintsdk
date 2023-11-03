@@ -11,8 +11,8 @@
 #include <map>
 #include <memory>
 #include <imgui_json.h>
-#include <variant.hpp>  // variant for C++14
-//#include <variant>    // variant for C++17
+//#include <variant.hpp>  // variant for C++14
+#include <variant>    // variant for C++17
 # define span_FEATURE_MAKE_SPAN 1
 #include <span.hpp>
 #include <imgui.h>
@@ -33,13 +33,13 @@ typedef uint32_t ID_TYPE;
 typedef uint32_t VERSION_TYPE;
 
 // for C++14
-using nonstd::get;
-using nonstd::monostate;
-using nonstd::variant;
+//using nonstd::get;
+//using nonstd::monostate;
+//using nonstd::variant;
 // for C++17
-//using std::get;
-//using std::monostate;
-//using std::variant;
+using std::get;
+using std::monostate;
+using std::variant;
 using nonstd::span;
 using nonstd::make_span;
 using std::string;
