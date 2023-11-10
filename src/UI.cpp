@@ -1330,7 +1330,7 @@ void BluePrintUI::DrawNodes()
             ImGui::BeginHorizontal("horizontal");
             ImFont* font = HeaderFont();
             if (font) ImGui::PushFont(font);
-            ImGui::AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(32, 32, 32, 255));
+            ImGui::GetWindowDrawList()->AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(32, 32, 32, 255));
             ImGui::Dummy(ImVec2(0, ImGui::GetFontSize()));
             if (font) ImGui::PopFont();
             ImGui::EndHorizontal();
@@ -1606,7 +1606,7 @@ void BluePrintUI::DrawNodes()
             ImGui::Dummy(ImVec2(0.1f, 0.f)); ImGui::SameLine(0);
             ImFont* font = HeaderFont();
             if (font) ImGui::PushFont(font);
-            ImGui::AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(16, 16, 16, 255));
+            ImGui::GetWindowDrawList()->AddTextComplex(nodeName.c_str(), 1.f, IM_COL32_WHITE, 1.0f, IM_COL32(128, 128, 128, 255), ImVec2(2.0, 2.0), IM_COL32(16, 16, 16, 255));
             ImGui::Dummy(ImVec2(0, ImGui::GetFontSize()));
             if (font) ImGui::PopFont();
             const float titleTextSize = ImGui::CalcTextSize(nodeName.c_str()).x;
