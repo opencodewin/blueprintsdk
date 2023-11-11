@@ -7,6 +7,21 @@
 static std::string ini_file = "test_blueprint.ini";
 static std::string bluepoint_file = "test_bp.json";
 
+static int OnBluePrintChange(int type, std::string name, void* handle)
+{
+    int ret = BluePrint::BP_CBR_Nothing;
+    if (/*type == BluePrint::BP_CB_Link ||
+        type == BluePrint::BP_CB_Unlink ||
+        type == BluePrint::BP_CB_NODE_DELETED ||
+        type == BluePrint::BP_CB_NODE_APPEND ||*/
+        type == BluePrint::BP_CB_NODE_INSERT)
+    {
+        // need update
+        ret = BluePrint::BP_CBR_AutoLink;
+    }
+    return ret;
+}
+
 static void BlueprintTest_SetupContext(ImGuiContext* ctx, bool in_splash)
 {
     if (!ctx)
@@ -43,6 +58,9 @@ static void BlueprintTest_Initialize(void** handle)
     io.IniFilename = ini_file.c_str();
     BluePrint::BluePrintUI * UI = new BluePrint::BluePrintUI();
     UI->Initialize(bluepoint_file.c_str());
+    BluePrint::BluePrintCallbackFunctions callbacks;
+    callbacks.BluePrintOnChanged = OnBluePrintChange;
+    UI->SetCallbacks(callbacks, nullptr);
     *handle = UI;
 #ifdef USE_THUMBNAILS
     ImGuiFileDialog::Instance()->SetCreateThumbnailCallback([](IGFD_Thumbnail_Info *vThumbnail_Info) -> void
