@@ -41,7 +41,7 @@
 #define ICON_NODE_NEXT          u8"\uf0da"
 #define ICON_NODE_ENABLE        u8"\ue8f4"
 #define ICON_NODE_DISABLE       u8"\ue8f5"
-#define ICON_RESET              u8"\ue042"
+#define ICON_RESET              u8"\ue4e0"
 #define ICON_RESET_ALL          u8"\ue627"
 #define ICON_THUMBNAIL          u8"\ue8d9"
 #else
