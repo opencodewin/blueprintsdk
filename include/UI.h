@@ -332,6 +332,7 @@ public:
 
     void HandleAutoLink(Node *node, vector<std::pair<Pin *, Pin *>>& relink_pairs);
     void HandleAutoLink(Node *node, Node* input_node, Node* output_node);
+    void HandleAutoLink(Node *node, Pin* from_pin);
 
     Action m_File_Open       = { "Open...",         ICON_OPEN_BLUEPRINT,   [this] { File_Open();        } };
     Action m_File_Import     = { "Import...",       ICON_IMPORT_GROUP,     [this] { File_Import();      } };

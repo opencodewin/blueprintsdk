@@ -293,9 +293,11 @@ void NodeSettingDialog::Show(BluePrintUI& UI)
     if (!node)
         return;
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImVec2 center = ImGui::GetWindowViewport()->GetCenter();
+    auto viewport = ImGui::GetWindowViewport();
+    ImVec2 center = viewport->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("##setting_node_dialog", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings))
+    ImGui::SetNextWindowViewport(viewport->ID);
+    if (ImGui::BeginPopupModal("##setting_node_dialog", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking))
     {
         ImGui::Text("Setting"); ImGui::SameLine();
         ImGui::Text("%" PRI_node "\n", FMT_node(node));
@@ -455,7 +457,7 @@ void NodeCreateDialog::Show(BluePrintUI& UI)
                 auto ret = UI.m_CallBacks.BluePrintOnChanged(BP_CB_NODE_INSERT, UI.m_Document->m_Name, UI.m_UserHandle);
                 if (ret == BP_CBR_AutoLink)
                 {
-                    UI.HandleAutoLink(node, input_node, output_node);
+                    UI.HandleAutoLink(node, fromPin);
                 }
             }
         }
@@ -2755,6 +2757,30 @@ void BluePrintUI::HandleAutoLink(Node *node, Node* input_node, Node* output_node
             output_data_pin[i]->LinkTo(*current_out_data_pin[i]);
         }
     }   
+}
+
+void BluePrintUI::HandleAutoLink(Node *node, Pin* from_pin)
+{
+    if (!node)
+        return;
+    if (from_pin->GetType() == PinType::Flow)
+    {
+        auto flow_pin = node->GetAutoLinkInputFlowPin();
+        if (flow_pin)
+            from_pin->LinkTo(*flow_pin);
+    }
+    else
+    {
+        auto data_pins = node->GetAutoLinkInputDataPin();
+        for (auto pin : data_pins)
+        {
+            if (auto canLinkResult = pin->CanLinkTo(*from_pin))
+            {
+                pin->LinkTo(*from_pin);
+                break;
+            }
+        }
+    }
 }
 
 void BluePrintUI::HandleDestroyAction()
