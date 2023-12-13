@@ -82,6 +82,9 @@ StepResult Context::Step(Context * context, bool restep)
         context->m_Monitor->OnPreStep(*context);
     g_Mutex.unlock();
     
+    if (!entryPin->m_Node)
+        return context->SetStepResult(StepResult::Done);
+
     entryPin->m_Node->m_Hits ++;
 
     auto start_time = ImGui::get_current_time_usec();
@@ -103,12 +106,24 @@ StepResult Context::Step(Context * context, bool restep)
             context->m_CurrentFlowPin = next;
             g_Mutex.unlock();
         }
-        else if (!context->m_Callstack.empty())
+        else 
         {
-            g_Mutex.lock();
-            context->m_CurrentFlowPin = context->m_Callstack.back();
-            context->m_Callstack.pop_back();
-            g_Mutex.unlock();
+            if (context->m_StepToEnd)
+            {
+                g_Mutex.lock();
+                if (context->m_StepNode) context->m_CurrentNode = context->m_StepNode;
+                if (context->m_StepFlowPin) context->m_CurrentFlowPin = *context->m_StepFlowPin;
+                context->m_StepNode = nullptr;
+                context->m_StepToEnd = false;
+                g_Mutex.unlock();
+            }
+            else if (!context->m_Callstack.empty())
+            {
+                g_Mutex.lock();
+                context->m_CurrentFlowPin = context->m_Callstack.back();
+                context->m_Callstack.pop_back();
+                g_Mutex.unlock();
+            }
         }
     }
     else if (!context->m_Callstack.empty())
@@ -174,7 +189,7 @@ static void RunThread(Context& context, FlowPin& entryPoint)
     context.m_pause_event = false;
     while (context.m_Executing)
     {
-        if (context.m_Paused && !context.m_StepToNext && !context.m_StepCurrent)
+        if (context.m_Paused && !context.m_StepToNext && !context.m_StepCurrent && !context.m_StepToEnd)
         {
             context.SetContextMonitor(monitor);
             if (!context.m_pause_event)
@@ -222,6 +237,9 @@ static void RunThread(Context& context, FlowPin& entryPoint)
     context.m_Executing = false;
     context.m_Paused = false;
     context.m_ThreadRunning = false;
+    context.m_StepToEnd = false;
+    context.m_StepFlowPin = nullptr;
+    context.m_StepNode = nullptr;
     context.m_PrevNode = nullptr;
     context.m_CurrentNode = nullptr;
     context.m_PrevFlowPin = {};
@@ -307,6 +325,23 @@ StepResult Context::ThreadRestep()
 {
     if (m_Paused)
         m_StepCurrent = true;
+    return SetStepResult(StepResult::Success);
+}
+
+StepResult Context::ThreadStepToEnd(Node* node)
+{
+    if (m_Paused)
+    {
+        m_StepToEnd = true;
+        if (node)
+        {
+            g_Mutex.lock();
+            m_StepNode = node;
+            m_CurrentNode = node;
+            m_StepFlowPin = (FlowPin *)node->GetAutoLinkInputFlowPin();
+            g_Mutex.unlock();
+        }
+    }
     return SetStepResult(StepResult::Success);
 }
 

@@ -168,6 +168,9 @@ struct PrintNode final : Node
 
     span<Pin*> GetInputPins() override { return m_InputPins; }
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
+    Pin* GetAutoLinkInputFlowPin() override { return &m_Enter; }
+    Pin* GetAutoLinkOutputFlowPin() override { return &m_Exit; }
+    vector<Pin*> GetAutoLinkInputDataPin() override { return {&m_String}; }
 
     FlowPin   m_Enter  = { this, "Enter" };
     FlowPin   m_Exit   = { this, "Exit" };

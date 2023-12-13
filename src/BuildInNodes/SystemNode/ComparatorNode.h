@@ -179,6 +179,8 @@ struct ComparatorNode final : Node
 
     span<Pin*> GetInputPins() override { return m_InputPins; }
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
+    vector<Pin*> GetAutoLinkInputDataPin() override { return {&m_A, &m_B}; }
+    Pin* GetAutoLinkOutputFlowPin() override { return &m_False; }
 
     PinType m_Type = PinType::Any;
 

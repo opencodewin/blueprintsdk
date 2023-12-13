@@ -1697,7 +1697,11 @@ void BluePrintUI::DrawNodes()
                 ed::SetNodeChanged(node->m_ID);
                 if (m_CallBacks.BluePrintOnChanged)
                 {
-                    m_CallBacks.BluePrintOnChanged(BP_CB_PARAM_CHANGED, m_Document->m_Name, m_UserHandle);
+                    auto callback_ret = m_CallBacks.BluePrintOnChanged(BP_CB_PARAM_CHANGED, m_Document->m_Name, m_UserHandle);
+                    if (callback_ret == BP_CBR_RunAgain && m_Document->m_Blueprint.IsPaused())
+                    {
+                        m_Document->m_Blueprint.StepToEnd(node);
+                    }
                 }
             }
         }
@@ -3692,6 +3696,14 @@ bool BluePrintUI::Blueprint_Current()
     m_Document->m_Blueprint.ShowFlow();
     ed::PopStyleVar(2);
 
+    return true;
+}
+
+bool BluePrintUI::Blueprint_StepToEnd(Node* node)
+{
+    if (!m_Document || !node)
+        return false;
+    auto result = m_Document->m_Blueprint.StepToEnd(node);
     return true;
 }
 

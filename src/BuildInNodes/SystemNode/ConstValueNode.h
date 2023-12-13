@@ -182,6 +182,7 @@ struct ConstValueNode final : Node
     }
 
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
+    vector<Pin*> GetAutoLinkOutputDataPin() override { return {&m_Value}; }
 
     AnyPin m_Value = { this };
 

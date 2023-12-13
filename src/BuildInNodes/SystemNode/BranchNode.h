@@ -20,6 +20,9 @@ struct BranchNode final : Node
 
     span<Pin*> GetInputPins() override { return m_InputPins; }
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
+    Pin* GetAutoLinkInputFlowPin() override { return &m_Enter; }
+    Pin* GetAutoLinkOutputFlowPin() override { return &m_False; }
+    vector<Pin*> GetAutoLinkInputDataPin() override { return {&m_Condition}; }
 
     FlowPin m_Enter     = { this, "Enter" };
     BoolPin m_Condition = { this, "Condition" };

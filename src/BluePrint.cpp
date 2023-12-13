@@ -422,6 +422,11 @@ StepResult BP::Current()
     return m_Context.ThreadRestep();
 }
 
+StepResult BP::StepToEnd(Node * node)
+{
+    return m_Context.ThreadStepToEnd(node);
+}
+
 bool BP::IsExecuting()
 {
     return m_Context.m_Executing;

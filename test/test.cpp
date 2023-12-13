@@ -19,6 +19,11 @@ static int OnBluePrintChange(int type, std::string name, void* handle)
         // need update
         ret = BluePrint::BP_CBR_AutoLink;
     }
+    else if (type == BluePrint::BP_CB_PARAM_CHANGED ||
+            type == BluePrint::BP_CB_SETTING_CHANGED)
+    {
+        return BluePrint::BP_CBR_RunAgain;
+    }
     return ret;
 }
 

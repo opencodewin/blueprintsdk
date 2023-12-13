@@ -147,6 +147,8 @@ struct SwitchNode final : Node
 
     span<Pin*> GetInputPins() override { return m_InputPins; }
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
+    vector<Pin*> GetAutoLinkInputDataPin() override { return {&m_A, &m_B, &m_Condition}; }
+    vector<Pin*> GetAutoLinkOutputDataPin() override { return {&m_Result}; }
 
     PinType m_Type = PinType::Any;
 

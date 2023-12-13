@@ -41,6 +41,10 @@ struct LoopNode final : Node
 
     span<Pin*> GetInputPins() override { return m_InputPins; }
     span<Pin*> GetOutputPins() override { return m_OutputPins; }
+    Pin* GetAutoLinkInputFlowPin() override { return &m_Enter; }
+    Pin* GetAutoLinkOutputFlowPin() override { return &m_Completed; }
+    vector<Pin*> GetAutoLinkInputDataPin() override { return {&m_FirstIndex, &m_LastIndex, &m_Step}; }
+    vector<Pin*> GetAutoLinkOutputDataPin() override { return {&m_Index}; }
 
     FlowPin  m_Enter      = { this, "Enter" };
     Int32Pin m_FirstIndex = { this, "From" };

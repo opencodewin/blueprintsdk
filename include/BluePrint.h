@@ -144,6 +144,7 @@ struct IMGUI_API Context
     StepResult Pause();
     StepResult ThreadStep();
     StepResult ThreadRestep();
+    StepResult ThreadStepToEnd(Node* node = nullptr);
     StepResult Stop();
 
     Node* CurrentNode();
@@ -175,6 +176,7 @@ struct IMGUI_API Context
     bool                        m_Paused {false};
     bool                        m_StepToNext {false};
     bool                        m_StepCurrent {false};
+    bool                        m_StepToEnd {false};
     bool                        m_ThreadRunning {false};    // sub-thread is running
     bool                        m_pause_event   {false};
 
@@ -182,6 +184,8 @@ struct IMGUI_API Context
     std::vector<FlowPin>            m_Callstack;
     Node*                           m_CurrentNode {nullptr};
     Node*                           m_PrevNode {nullptr};
+    Node*                           m_StepNode {nullptr};
+    FlowPin*                        m_StepFlowPin {nullptr};
     FlowPin                         m_CurrentFlowPin = {};
     FlowPin                         m_PrevFlowPin = {};
     StepResult                      m_LastResult {StepResult::Done};
@@ -335,6 +339,7 @@ struct IMGUI_API BP
     StepResult Pause();
     StepResult Next();
     StepResult Current();
+    StepResult StepToEnd(Node * node = nullptr);
     bool IsOpened() { return m_IsOpen; }
     void SetOpen(bool opened) { m_IsOpen = opened; }
     bool IsExecuting();

@@ -247,6 +247,9 @@ struct FileSelectNode final : Node
             BuildOutputPin();
         return m_OutputPins; 
     }
+    Pin* GetAutoLinkInputFlowPin() override { return &m_Enter; }
+    Pin* GetAutoLinkOutputFlowPin() override { return &m_Exit; }
+    vector<Pin*> GetAutoLinkOutputDataPin() override { return {&m_FullPath}; }
 
     FlowPin   m_Enter       = { this, "Enter" };
     FlowPin   m_Exit        = { this, "Exit" };

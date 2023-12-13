@@ -203,6 +203,7 @@ enum BluePrintCallBackReturn:int
     BP_CBR_Unknown = -1,
     BP_CBR_Nothing,
     BP_CBR_AutoLink,
+    BP_CBR_RunAgain,
     BP_CBR_Custom,
 };
 
@@ -313,6 +314,7 @@ public:
     bool Blueprint_Pause();
     bool Blueprint_Next();
     bool Blueprint_Current();
+    bool Blueprint_StepToEnd(Node* node);
     bool Blueprint_BreakPoint();
 
     bool Blueprint_AppendNode(ID_TYPE type_id, ID_TYPE* node_id = nullptr);
