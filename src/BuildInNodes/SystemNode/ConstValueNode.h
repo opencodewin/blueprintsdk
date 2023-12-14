@@ -10,6 +10,7 @@ struct ConstValueNode final : Node
     ConstValueNode(BP* blueprint): Node(blueprint) 
     {
         SetType(PinType::Any);
+        m_HasCustomLayout = true;
     }
 
     void DrawSettingLayout(ImGuiContext * ctx) override
@@ -138,9 +139,6 @@ struct ConstValueNode final : Node
         }
         return false;
     }
-
-    bool HasSetting() const override { return true; }
-    bool CustomLayout() const override { return true; }
 
     void SetType(PinType type)
     {

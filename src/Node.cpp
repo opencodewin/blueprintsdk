@@ -449,21 +449,6 @@ void Node::SetBreakPoint(bool breaken)
     m_BreakPoint = breaken;
 }
 
-bool Node::HasSetting() const
-{
-    return true;
-}
-
-bool Node::Skippable() const
-{
-    return false;
-}
-
-bool Node::CustomLayout() const
-{
-    return false;
-}
-
 void Node::DrawSettingLayout(ImGuiContext * ctx)
 {
     // Draw Setting
@@ -549,6 +534,25 @@ void Node::DrawNodeLogo(ImTextureID logo, int& index, int cols, int rows, ImVec2
 bool Node::DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key, bool embedded)
 {
     return false;
+}
+
+void Node::DrawDataTypeSetting(const char * label, ImDataType& type, bool full_type)
+{
+    ImGui::TextUnformatted(label); ImGui::SameLine();
+    ImGui::RadioButton("AsInput", (int *)&type, (int)IM_DT_UNDEFINED); ImGui::SameLine();
+    auto pos = ImGui::GetCursorPos();
+    ImGui::RadioButton("Int8",    (int *)&type, (int)IM_DT_INT8); ImGui::SameLine();
+    ImGui::RadioButton("Int16",   (int *)&type, (int)IM_DT_INT16); ImGui::SameLine();
+    ImGui::RadioButton("Float16", (int *)&type, (int)IM_DT_FLOAT16); ImGui::SameLine();
+    ImGui::RadioButton("Float32", (int *)&type, (int)IM_DT_FLOAT32);
+    if (full_type)
+    {
+        ImGui::SetCursorPosX(pos.x);
+        ImGui::RadioButton("Int16BE", (int *)&type, (int)IM_DT_INT16_BE); ImGui::SameLine();
+        ImGui::RadioButton("Int32",   (int *)&type, (int)IM_DT_INT32); ImGui::SameLine();
+        ImGui::RadioButton("Int64",   (int *)&type, (int)IM_DT_INT64); ImGui::SameLine();
+        ImGui::RadioButton("Float64", (int *)&type, (int)IM_DT_FLOAT64);
+    }
 }
 
 LinkQueryResult Node::AcceptLink(const Pin& receiver, const Pin& provider) const

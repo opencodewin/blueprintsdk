@@ -183,11 +183,6 @@ void NodeContextMenu::Show(BluePrintUI& UI)
         menuAction(UI.m_Edit_Duplicate);
         ImGui::Separator();
         menuAction(UI.m_Edit_Delete);
-        //if (node->HasSetting())
-        //{
-        //    ImGui::Separator();
-        //    menuAction(UI.m_Edit_Setting);
-        //}
         if (node->GetStyle() == NodeStyle::Default)
         {
             ImGui::Separator();
@@ -297,7 +292,9 @@ void NodeSettingDialog::Show(BluePrintUI& UI)
     ImVec2 center = viewport->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     ImGui::SetNextWindowViewport(viewport->ID);
-    if (ImGui::BeginPopupModal("##setting_node_dialog", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking))
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoNav;
+    if (node->m_SettingAutoResize) flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    if (ImGui::BeginPopupModal("##setting_node_dialog", NULL, flags))
     {
         ImGui::Text("Setting"); ImGui::SameLine();
         ImGui::Text("%" PRI_node "\n", FMT_node(node));
@@ -1087,7 +1084,7 @@ float BluePrintUI::DrawNodeToolBar(Node *node, Node **need_clone_node)
     auto node_size = ed::GetNodeSize(node->m_ID);
     float icon_offset = 16 + 2; // base offset + resize speed
     const float icon_gap = 18;
-    if (node->Skippable())
+    if (node->m_Skippable)
     {
         icon_offset += icon_gap;
         ImGui::SetCursorScreenPos(current_pos + ImVec2(node_size.x - icon_offset, 8));
@@ -1118,7 +1115,7 @@ float BluePrintUI::DrawNodeToolBar(Node *node, Node **need_clone_node)
         }
         if (ImGui::IsItemHovered()) node->m_IconHovered = 3;
     }
-    if (node->HasSetting())
+    if (node->m_HasSetting)
     {
         icon_offset += icon_gap;
         ImGui::SetCursorScreenPos(current_pos + ImVec2(node_size.x - icon_offset, 8));
@@ -1230,7 +1227,7 @@ ImVec2 BluePrintUI::Blueprint_EstimateNodeSize(Node* node)
         int max_pin_width = 0;
         for (auto& pin : node->GetInputPins())
         {
-            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->CustomLayout() || m_isChildWindow)) 
+            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->m_HasCustomLayout || m_isChildWindow)) 
             {
                 const float pinwidth = ImGui::CalcTextSize(pin->m_Name.c_str()).x;
                 if (max_pin_width < pinwidth) max_pin_width = pinwidth;
@@ -1240,14 +1237,14 @@ ImVec2 BluePrintUI::Blueprint_EstimateNodeSize(Node* node)
         max_pin_width = 0;
         for (auto& pin : node->GetOutputPins())
         {
-            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->CustomLayout() || m_isChildWindow)) 
+            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->m_HasCustomLayout || m_isChildWindow)) 
             {
                 const float pinwidth = ImGui::CalcTextSize(pin->m_Name.c_str()).x;
                 if (max_pin_width < pinwidth) max_pin_width = pinwidth;
             }
         }
         node_size.x += max_pin_width;
-        if (node->CustomLayout() && !m_isChildWindow)
+        if (node->m_HasCustomLayout && !m_isChildWindow)
         {
             // hard to estimate
             node_size.x += 200;
@@ -1625,7 +1622,7 @@ void BluePrintUI::DrawNodes()
         ImGui::Dummy(ImVec2(dummy_width, 0.0f)); // For minimum node width
 
         ImGui::Grid layout;
-        layout.Begin(node->m_ID, CheckNodeStyle(node, NodeStyle::Simple) || (!m_isChildWindow && node->CustomLayout()) ? 3 : 2, dummy_width + 36);
+        layout.Begin(node->m_ID, CheckNodeStyle(node, NodeStyle::Simple) || (!m_isChildWindow && node->m_HasCustomLayout) ? 3 : 2, dummy_width + 36);
         layout.SetColumnAlignment(0.0f);
         // Draw column with input pins.
         for (auto& pin : node->GetInputPins())
@@ -1656,13 +1653,13 @@ void BluePrintUI::DrawNodes()
                 PinTypeToColor(this, pin->GetValueType()));
 
             // [2] - Show pin name if it has one. Custom layout hidden name?
-            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->CustomLayout() || m_isChildWindow)) 
+            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->m_HasCustomLayout || m_isChildWindow)) 
             {
                 ImGui::SameLine();
                 show_pin_name(pin->m_Name);
             }
             // [3] - Show value/editor when pin is not linked to anything
-            if (!m_Document->m_Blueprint.HasPinAnyLink(*pin) && !CheckNodeStyle(node, NodeStyle::Simple) && !(node->CustomLayout() || m_isChildWindow))
+            if (!m_Document->m_Blueprint.HasPinAnyLink(*pin) && !CheckNodeStyle(node, NodeStyle::Simple) && !(node->m_HasCustomLayout || m_isChildWindow))
             {
                 ImGui::SameLine();
                 DrawPinValueWithEditor(*pin);
@@ -1686,7 +1683,7 @@ void BluePrintUI::DrawNodes()
             ImGui::TextUnformatted(nodeName.data());
             if (font) ImGui::PopFont();
         }
-        else if (node->CustomLayout() && !m_isChildWindow)
+        else if (node->m_HasCustomLayout && !m_isChildWindow)
         {
             layout.SetColumnAlignment(0.0f);
             layout.NextColumn();
@@ -1737,7 +1734,7 @@ void BluePrintUI::DrawNodes()
             //       does not look good for blueprint nodes.
             ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
             // [1] - Show pin name if it has one. Custom layout hidden name?
-            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->CustomLayout() || m_isChildWindow))
+            if (!pin->m_Name.empty() && (!CheckNodeStyle(node, NodeStyle::Simple) || pin->m_Flags & PIN_FLAG_FORCESHOW) && (!node->m_HasCustomLayout || m_isChildWindow))
             {
                 show_pin_name(pin->m_Name);
                 ImGui::SameLine();

@@ -34,7 +34,7 @@ struct PrintNode final : Node
 
     BP_NODE(PrintNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Debug")
 
-    PrintNode(BP* blueprint): Node(blueprint) { m_Name = "Print"; }
+    PrintNode(BP* blueprint): Node(blueprint) { m_Name = "Print"; m_HasCustomLayout = true; }
 
     FlowPin Execute(Context& context, FlowPin& entryPoint, bool threading = false) override
     {
@@ -48,11 +48,6 @@ struct PrintNode final : Node
             LOGD("PrintNode: %s\n", m_string.c_str()); // need disable on run thread mode
         }
         return m_Exit;
-    }
-
-    bool CustomLayout() const override
-    {
-        return m_custom_layout;
     }
 
     int Load(const imgui_json::value& value) override
@@ -69,8 +64,6 @@ struct PrintNode final : Node
                 return BP_ERR_NODE_LOAD;
 
             m_print_to_layout = val.get<imgui_json::boolean>();
-            if (m_print_to_layout)
-                m_custom_layout = true;
         }
         if (value.contains("tube_digital"))
         {
@@ -112,14 +105,6 @@ struct PrintNode final : Node
         // Custom Node Setting
         ImGui::TextUnformatted("Print To Layout"); ImGui::SameLine();
         ImGui::ToggleButton("##toggle_print_layout", &m_print_to_layout);
-        if (m_print_to_layout)
-        {
-            m_custom_layout = true;
-        }
-        else
-        {
-            m_custom_layout = false;
-        }
 
         ImGui::Separator();
         ImGui::TextUnformatted("Print tube digital"); ImGui::SameLine();
@@ -181,7 +166,6 @@ struct PrintNode final : Node
 
     ImVec4 m_text_color             {ImVec4(0,0,0,128)};
     PrintFunction s_PrintFunction   {nullptr};
-    bool    m_custom_layout         {false};
     bool    m_print_to_layout       {false};
     bool    m_tube_digital          {true};
     std::string  m_string;

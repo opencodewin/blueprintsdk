@@ -229,9 +229,6 @@ struct IMGUI_API Node
     virtual ID_TYPE         GetTypeID() const;
     virtual NodeStyle       GetStyle() const;
     virtual std::string     GetCatalog() const;
-    virtual bool            HasSetting() const;
-    virtual bool            CustomLayout() const;
-    virtual bool            Skippable() const;
     virtual std::string     GetName() const;
     virtual void            SetName(std::string name);
     virtual void            SetBreakPoint(bool breaken);
@@ -259,11 +256,15 @@ struct IMGUI_API Node
     virtual void DrawNodeLogo(ImTextureID logo, int& index, int cols, int rows, ImVec2 size) const;
     virtual ImTextureID LoadNodeLogo(void * data, int size) const;
 
+    static void DrawDataTypeSetting(const char * label, ImDataType& type, bool full_type = false);
+
     ID_TYPE         m_ID                {0};
     string          m_Name              {""};
     BP*             m_Blueprint         {nullptr};
     int             m_IconHovered       {-1};
-    bool            m_HasSetting        {false};
+    bool            m_HasSetting        {true};
+    bool            m_SettingAutoResize {true};
+    bool            m_HasCustomLayout   {false};
     bool            m_BreakPoint        {false};
     bool            m_NoBackGround      {false};
     bool            m_Skippable         {false};
@@ -288,6 +289,10 @@ struct ClipNode
         m_GroupSize = ed::GetGroupSize(node->m_ID);
         m_HasSetting = node->m_HasSetting;
         m_Skippable = node->m_Skippable;
+        m_SettingAutoResize = node->m_SettingAutoResize;
+        m_HasCustomLayout = node->m_HasCustomLayout;
+        m_BreakPoint = node->m_BreakPoint;
+        m_Enabled = node->m_Enabled;
     }
 
     NodeTypeInfo    m_NodeInfo;
@@ -295,8 +300,12 @@ struct ClipNode
     ImVec2          m_Size              {ImVec2{0, 0}};
     ImVec2          m_GroupSize         {ImVec2{0, 0}};
     string          m_Name              {""};
-    bool            m_HasSetting        {false};
+    bool            m_HasSetting        {true};
+    bool            m_SettingAutoResize {true};
+    bool            m_HasCustomLayout   {false};
     bool            m_Skippable         {false};
+    bool            m_BreakPoint        {false};
+    bool            m_Enabled           {true};
 };
 
 struct IMGUI_API NodeRegistry

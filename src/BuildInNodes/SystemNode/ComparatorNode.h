@@ -17,7 +17,7 @@ struct ComparatorNode final : Node
 {
     BP_NODE(ComparatorNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "Flow")
 
-    ComparatorNode(BP* blueprint): Node(blueprint) { m_Name = "Comparator"; }
+    ComparatorNode(BP* blueprint): Node(blueprint) { m_Name = "Comparator"; m_HasCustomLayout = true; }
 
     int ComparePinValue(PinValue& a, PinValue& b)
     {
@@ -104,8 +104,6 @@ struct ComparatorNode final : Node
         ImGui::RadioButton("<=", (int *)&m_CompareType, LessEqual); ImGui::SameLine();
         ImGui::RadioButton("!=", (int *)&m_CompareType, NotEqual);
     }
-
-    bool CustomLayout() const override { return true; }
 
     bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key, bool embedded) override
     {

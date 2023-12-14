@@ -17,7 +17,7 @@ struct FileSelectNode final : Node
         FILESELECT_SUFFIX    = 1 << 2,
     };
     BP_NODE(FileSelectNode, VERSION_BLUEPRINT, VERSION_BLUEPRINT_API, NodeType::Internal, NodeStyle::Default, "System")
-    FileSelectNode(BP* blueprint): Node(blueprint) { m_Name = "FileSelect"; }
+    FileSelectNode(BP* blueprint): Node(blueprint) { m_Name = "FileSelect"; m_HasCustomLayout = true; }
     
     FlowPin Execute(Context& context, FlowPin& entryPoint, bool threading = false) override
     {
@@ -228,7 +228,6 @@ struct FileSelectNode final : Node
         value["bookmark"] = m_bookmark;
     }
 
-    bool CustomLayout() const override { return true; }
     void BuildOutputPin()
     {
         m_OutputPins.clear();
