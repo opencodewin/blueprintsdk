@@ -4187,6 +4187,8 @@ void BluePrintUI::UpdateActions()
         }
     }
 
+    if (isThreadExecuting && !isThreadPaused) ImGui::UpdateData(); // keep fleshing output if BP is running
+
     auto select_nodes = GetSelectedNodes(&m_Document->m_Blueprint);
     for (auto node : select_nodes)
     {
@@ -4499,7 +4501,7 @@ void BluePrintUI::ShowToolbar(bool* show)
         ImGui::SameLine();
         ImGui::Text("%d(%s)", m_Document->m_Blueprint.StepCount(), StepResultToString(m_Document->m_Blueprint.LastStepResult()));
         ImGui::SameLine();
-        ImGui::Text("%.3fms/%.1fFPS", ImGui::GetIO().DeltaTime * 1000.f, ImGui::GetIO().Framerate);
+        ImGui::Text("%.3fms/%.1fFPS(%d/%d)", ImGui::GetIO().DeltaTime * 1000.f, ImGui::GetIO().Framerate, ImGui::GetIO().FrameCountSinceLastUpdate, ImGui::GetIO().FrameCountSinceLastEvent);
         ImGui::SameLine();
         //ImGui::Text("%s", Blueprint_IsExecutable() ? "R" : "X");
         //ImGui::SameLine();

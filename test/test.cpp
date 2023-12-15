@@ -144,6 +144,8 @@ void Application_Setup(ApplicationWindowProperty& property)
     property.full_size = true;
     property.auto_merge = false;
     property.font_scale = 2.0f;
+    property.low_reflash = true;
+    property.power_save = true;
     property.application.Application_SetupContext = BlueprintTest_SetupContext;
     property.application.Application_Initialize = BlueprintTest_Initialize;
     property.application.Application_Finalize = BlueprintTest_Finalize;
