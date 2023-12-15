@@ -143,6 +143,7 @@ void Application_Setup(ApplicationWindowProperty& property)
     property.resizable = false;
     property.full_size = true;
     property.auto_merge = false;
+    property.font_scale = 2.0f;
     property.application.Application_SetupContext = BlueprintTest_SetupContext;
     property.application.Application_Initialize = BlueprintTest_Initialize;
     property.application.Application_Finalize = BlueprintTest_Finalize;
