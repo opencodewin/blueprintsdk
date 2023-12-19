@@ -44,6 +44,7 @@
 #define ICON_RESET              u8"\ue4e0"
 #define ICON_RESET_ALL          u8"\ue627"
 #define ICON_THUMBNAIL          u8"\ue8d9"
+#define ICON_SETTING_PANEL      u8"\ue9c8"
 #else
 #define ICON_OPEN_BLUEPRINT     "Open"
 #define ICON_NEW_BLUEPRINT      "New"
@@ -72,6 +73,7 @@
 #define ICON_RESET              "r"
 #define ICON_RESET_ALL          "R"
 #define ICON_THUMBNAIL          "N"
+#define ICON_SETTING_PANEL      "P"
 #endif
 
 namespace ed = ax::NodeEditor;
@@ -242,6 +244,7 @@ struct BluePrintUI
     std::vector<ClipNode>           m_ClipBoard;
     bool                            m_isNewNodePopuped {false};
     bool                            m_isChildWindow {false};
+    bool                            m_ShowSettingPanel {false};
     bool                            m_isShowInfoTooltips {false};
     bool                            m_isShowThumbnails {false};
     float                           m_ThumbnailScale {0.25f};
@@ -268,6 +271,7 @@ public:
     Node*   ShowNewNodeMenu(ImVec2 popupPosition = {}, std::string catalog_filter = "");
     void    ShowStyleEditor(bool* show = nullptr);
     void    ShowToolbar(bool* show = nullptr);
+    void    ShowSettingPanel(bool* show = nullptr);
     void    ShowShortToolbar(bool vertical = true, bool* show = nullptr);
     void    Thumbnails(float view_expand = 1.0f, ImVec2 size = ImVec2(0, 0), ImVec2 pos = ImVec2(-1, -1));
     bool    Blueprint_IsValid();

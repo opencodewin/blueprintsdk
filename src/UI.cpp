@@ -807,6 +807,7 @@ bool BluePrintUI::Frame(bool child_window, bool show_node, bool bp_enabled, uint
             ed::SetCurrentEditor(m_Editor);
             UpdateActions();
             ShowToolbar();
+            ShowSettingPanel(&m_ShowSettingPanel);
             if (m_isShowThumbnails || m_ThumbnailShowCount > 0) Thumbnails(2.f);
             ed::Begin("###main_editor");
                 if (show_node)
@@ -973,6 +974,7 @@ void BluePrintUI::InstallDocumentCallbacks()
                 case ed::TransactionAction::Unknown:    return "Unknown";
                 case ed::TransactionAction::Navigation: return "Navigation";
                 case ed::TransactionAction::DragStart:  return "DragStart";
+                case ed::TransactionAction::Dragging:   return "Dragging";
                 case ed::TransactionAction::DragEnd:    return "DragEnd";
                 case ed::TransactionAction::Resize:     return "Resize";
                 default : return "";
@@ -1008,6 +1010,7 @@ void BluePrintUI::InstallDocumentCallbacks()
             auto  node = const_cast<BP&>(blueprint).FindNode(static_cast<ID_TYPE>(nodeId.Get()));
             if (!node)
                 return;
+            auto self = reinterpret_cast<BluePrintUI*>(m_Transaction->GetDocument()->m_UserData);
             ++m_ActionCount;
             m_NodeIds.push_back(nodeId);
             if (action == ed::TransactionAction::DragStart)
@@ -1015,6 +1018,14 @@ void BluePrintUI::InstallDocumentCallbacks()
                 ++m_DragActionCount;
                 node->OnDragStart(blueprint.GetContext());
                 m_Transaction->AddAction("Drag Start %" PRI_node, FMT_node(node));
+                if (self) self->m_ThumbnailShowCount = THUMBNAIL_COUNT;
+            }
+            else if (action == ed::TransactionAction::Dragging)
+            {
+                ++m_DragActionCount;
+                node->OnDragging(blueprint.GetContext());
+                m_Transaction->AddAction("Dragging %" PRI_node, FMT_node(node));
+                if (self) self->m_ThumbnailShowCount = THUMBNAIL_COUNT;
             }
             else if (action == ed::TransactionAction::DragEnd)
             {
@@ -1026,6 +1037,7 @@ void BluePrintUI::InstallDocumentCallbacks()
             {
                 node->OnResize(blueprint.GetContext());
                 m_Transaction->AddAction("Resize %" PRI_node, FMT_node(node));
+                if (self) self->m_ThumbnailShowCount = THUMBNAIL_COUNT;
             }
             else if (action == ed::TransactionAction::Select)
             {
@@ -1115,7 +1127,7 @@ float BluePrintUI::DrawNodeToolBar(Node *node, Node **need_clone_node)
         }
         if (ImGui::IsItemHovered()) node->m_IconHovered = 3;
     }
-    if (node->m_HasSetting)
+    if (!m_ShowSettingPanel && node->m_HasSetting)
     {
         icon_offset += icon_gap;
         ImGui::SetCursorScreenPos(current_pos + ImVec2(node_size.x - icon_offset, 8));
@@ -1586,20 +1598,20 @@ void BluePrintUI::DrawNodes()
                 auto rounding = ed::GetStyle().NodeRounding;
                 auto nodeStart = ed::GetNodePosition(node->m_ID);
                 auto nodeSize  = ed::GetNodeSize(node->m_ID);
-                auto itemMin = ImGui::GetItemRectMin();
-                auto itemMax = ImGui::GetItemRectMax();
-                itemMin   = nodeStart;
-                itemMin.x = itemMin.x + border - 0.5f;
-                itemMin.y = itemMin.y + border - 0.5f;
-                itemMax.x = nodeStart.x + nodeSize.x - border + 0.5f;
-                itemMax.y = itemMax.y + ImGui::GetStyle().ItemSpacing.y + 0.5f;
-                drawList->AddRectFilled(itemMin, itemMax, ImColor(isDummy ? m_StyleColors[BluePrintStyleColor_TitleBgDummy] : m_StyleColors[BluePrintStyleColor_TitleBg]), rounding, ImDrawFlags_RoundCornersTop & (ImDrawFlags_RoundCornersLeft | ImDrawFlags_RoundCornersRight));
+                ImRect itemRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+                itemRect.Min = nodeStart;
+                itemRect.Min.x = itemRect.Min.x + border - 0.5f;
+                itemRect.Min.y = itemRect.Min.y + border - 0.5f;
+                itemRect.Max.x = nodeStart.x + nodeSize.x - border + 0.5f;
+                itemRect.Max.y = itemRect.Max.y + ImGui::GetStyle().ItemSpacing.y + 0.5f;
+                drawList->AddRectFilled(itemRect.Min, itemRect.Max, ImColor(isDummy ? m_StyleColors[BluePrintStyleColor_TitleBgDummy] : m_StyleColors[BluePrintStyleColor_TitleBg]), rounding, ImDrawFlags_RoundCornersTop & (ImDrawFlags_RoundCornersLeft | ImDrawFlags_RoundCornersRight));
                 auto size = ImVec2(8.0f, 8.0f);
-                auto pos = itemMin + ImVec2(6, (itemMax.y - itemMin.y) / 2 - size.y / 2);
+                auto pos = itemRect.Min + ImVec2(6, (itemRect.Max.y - itemRect.Min.y) / 2 - size.y / 2);
                 if (ImGui::BulletToggleButton("##set_break_point", &node->m_BreakPoint, pos, size))
                 {
                     ed::SetNodeChanged(node->m_ID);
                 }
+                
                 //ImGui::Debug_DrawItemRect();
             });
             ImGui::Dummy(ImVec2(0.1f, 0.f)); ImGui::SameLine(0);
@@ -1767,6 +1779,7 @@ void BluePrintUI::DrawNodes()
         ed::EndNode();
         if (isDummy)
             ed::PopStyleColor(1);
+        
 #if DEBUG_GROUP_NODE
         else if (isGrouped)
             ed::PopStyleColor(1);
@@ -2163,7 +2176,7 @@ void BluePrintUI::ShowDialogs()
     m_LinkContextMenu.Show(*this);
     m_NodeDeleteDialog.Show(*this);
     m_NodeCreateDialog.Show(*this);
-    m_NodeSettingDialog.Show(*this);
+    if (!m_ShowSettingPanel) m_NodeSettingDialog.Show(*this);
     ed::Resume();
 }
 
@@ -4487,12 +4500,13 @@ void BluePrintUI::ShowToolbar(bool* show)
         ImGui::SameLine();
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
         ImGui::SameLine();
-        string info_button_title = string(ICON_MD_INFO_OUTLINE) + "##info_tooltips";
-        ImGui::CheckButton(info_button_title.c_str(), &m_isShowInfoTooltips, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::CheckButton(ICON_MD_INFO_OUTLINE "##info_tooltips", &m_isShowInfoTooltips, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
         ImGui::ShowTooltipOnHover("Show Info in tooltips");
         ImGui::SameLine();
-        string thumbnail_button_title = string(ICON_THUMBNAIL) + "##thumbnails";
-        ImGui::CheckButton(thumbnail_button_title.c_str(), &m_isShowThumbnails, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::CheckButton(ICON_SETTING_PANEL "##setting_panel", &m_ShowSettingPanel, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::ShowTooltipOnHover("Show Setting Panel");
+        ImGui::SameLine();
+        ImGui::CheckButton(ICON_THUMBNAIL "##thumbnails", &m_isShowThumbnails, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
         ImGui::ShowTooltipOnHover("Show Thumbnails");
         ImGui::SameLine();
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
@@ -4506,6 +4520,63 @@ void BluePrintUI::ShowToolbar(bool* show)
         //ImGui::Text("%s", Blueprint_IsExecutable() ? "R" : "X");
         //ImGui::SameLine();
         ImGui::Dummy(ImVec2(20, 0));
+    }
+    ImGui::End();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(4);
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        io.ConfigViewportsNoDecoration = false;
+    }
+}
+
+void BluePrintUI::ShowSettingPanel(bool* show)
+{
+    if (show && !*show)
+        return;
+    auto& io = ImGui::GetIO();
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        const ImGuiViewport* viewport = ImGui::GetWindowViewport();
+        io.ConfigViewportsNoDecoration = true;
+        ImGui::SetNextWindowViewport(viewport->ID);
+    }
+    ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
+    ImGui::PushStyleColor(ImGuiCol_Button, m_StyleColors[BluePrintStyleColor_ToolButton]);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, m_StyleColors[BluePrintStyleColor_ToolButtonHovered]);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, m_StyleColors[BluePrintStyleColor_ToolButtonActive]);
+    ImGui::PushStyleColor(ImGuiCol_TexGlyphShadow, ImVec4(0.1, 0.1, 0.1, 0.8));
+    ImGui::PushStyleVar(ImGuiStyleVar_TexGlyphShadowOffset, ImVec2(2.0, 2.0));
+    if (ImGui::Begin("Setting Panel", show, window_flags))
+    {
+        for (auto node : m_Document->m_Blueprint.GetNodes())
+        {
+            auto type = node->GetTypeInfo().m_Type;
+            if (type == BluePrint::NodeType::EntryPoint || type == BluePrint::NodeType::ExitPoint)
+                continue;
+            auto label_name = node->m_Name;
+            std::string lable_id = label_name + "##node_setting" + "@" + std::to_string(node->m_ID);
+            auto node_pos = ImGui::GetCursorScreenPos();
+            node->DrawNodeLogo(ImGui::GetCurrentContext(), ImVec2(60, 30));
+            ImGui::SameLine(40);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0));
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.5, 0.5, 0.0, 0.5));
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.2, 0.5, 0.2, 0.5));
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.1, 0.5, 0.1, 0.5));
+            ImGuiTreeNodeFlags tree_flags = ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowOverlap;
+            if (node->IsSelected()) tree_flags |= ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Selected;
+            bool tree_open = ImGui::TreeNodeEx(lable_id.c_str(), tree_flags);
+            ImGui::PopStyleColor(4);
+            if (tree_open)
+            {
+                node->DrawSettingLayout(ImGui::GetCurrentContext());
+                ImGui::TreePop();
+            }
+            ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1,1,1,1));
+            ImGui::Separator();
+            ImGui::PopStyleColor();
+        }
     }
     ImGui::End();
     ImGui::PopStyleVar();
@@ -4561,10 +4632,13 @@ void BluePrintUI::Thumbnails(float view_expand, ImVec2 size, ImVec2 pos)
         {
             auto node_pos = (ed::GetNodePosition(node->m_ID) - screen_rect.Min) * m_ThumbnailScale * view_scale / zoom;
             auto node_size = ed::GetNodeSize(node->m_ID) * m_ThumbnailScale * view_scale / zoom;
+            if (node->IsSelected())
+                drawList->AddRect(cursorPos + node_pos, cursorPos + node_pos + node_size, IM_COL32(255, 255, 0, window_alpha * 255));
             drawList->AddRectFilled(cursorPos + node_pos, cursorPos + node_pos + node_size, ImGui::GetColorU32(ImGuiCol_Border, window_alpha));
         }
     }
     ImGui::End();
+    ImGui::UpdateData();
     m_ThumbnailShowCount --;
     if (m_ThumbnailShowCount <= 0) m_ThumbnailShowCount = 0;
 }

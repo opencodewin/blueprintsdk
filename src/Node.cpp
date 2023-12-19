@@ -449,6 +449,11 @@ void Node::SetBreakPoint(bool breaken)
     m_BreakPoint = breaken;
 }
 
+bool Node::IsSelected()
+{
+    return ed::IsNodeSelected(m_ID);
+}
+
 void Node::DrawSettingLayout(ImGuiContext * ctx)
 {
     // Draw Setting

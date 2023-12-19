@@ -135,6 +135,7 @@ struct IMGUI_API Node
     virtual void OnClose(Context& context) {}
 
     virtual void OnDragStart(const Context& context) {}
+    virtual void OnDragging(const Context& context) {}
     virtual void OnDragEnd(const Context& context) {}
     virtual void OnResize(const Context& context) {}
     virtual void OnSelect(const Context& context) {}
@@ -232,6 +233,7 @@ struct IMGUI_API Node
     virtual std::string     GetName() const;
     virtual void            SetName(std::string name);
     virtual void            SetBreakPoint(bool breaken);
+    virtual bool            IsSelected();
 
     virtual LinkQueryResult AcceptLink(const Pin& receiver, const Pin& provider) const; // Checks if node accept link between these two pins. There node can filter out unsupported link types.
     virtual void            WasLinked(const Pin& receiver, const Pin& provider); // Notifies node that link involving one of its pins has been made.
