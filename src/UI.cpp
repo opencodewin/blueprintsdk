@@ -4535,7 +4535,7 @@ void BluePrintUI::ShowSettingPanel(bool* show)
     if (show && !*show)
         return;
     auto& io = ImGui::GetIO();
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_TitleBarBold;
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
         const ImGuiViewport* viewport = ImGui::GetWindowViewport();
