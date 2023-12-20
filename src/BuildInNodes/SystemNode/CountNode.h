@@ -42,15 +42,16 @@ struct CountNode final : Node
         return m_Exit;
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // Draw Set Node Name
-        Node::DrawSettingLayout(ctx);
+        auto changed = Node::DrawSettingLayout(ctx);
         ImGui::Separator();
 
         // Draw Custom Setting
         ImGui::SetCurrentContext(ctx);
-        ImGui::TextUnformatted("Accumulate"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_acc", &m_Accumulate);
+        ImGui::TextUnformatted("Accumulate"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_acc", &m_Accumulate);
+        return changed;
     }
 
     int Load(const imgui_json::value& value) override

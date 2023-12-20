@@ -30,16 +30,16 @@ struct FileSelectNode final : Node
         return m_Exit;
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // Draw default setting
-        Node::DrawSettingLayout(ctx);
+        auto changed = Node::DrawSettingLayout(ctx);
         ImGui::Separator();
 
         // Draw Custom setting
-        ImGui::Checkbox(ICON_IGFD_BOOKMARK " Bookmark", &m_isShowBookmark);
+        changed |= ImGui::Checkbox(ICON_IGFD_BOOKMARK " Bookmark", &m_isShowBookmark);
         ImGui::SameLine(0);
-        ImGui::Checkbox(ICON_IGFD_HIDDEN_FILE " ShowHide", &m_isShowHiddenFiles);
+        changed |= ImGui::Checkbox(ICON_IGFD_HIDDEN_FILE " ShowHide", &m_isShowHiddenFiles);
         ImGui::SameLine(0);
         // file filter setting
         if (ImGui::InputText("Filters", (char*)m_filters.data(), m_filters.size() + 1, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackResize, [](ImGuiInputTextCallbackData* data) -> int
@@ -61,14 +61,15 @@ struct FileSelectNode final : Node
         }, &m_filters))
         {
             m_filters.resize(strlen(m_filters.c_str()));
+            changed = true;
         }
         ImGui::Separator();
         bool flag_folder        = m_out_flags & FILESELECT_FOLDER;
         bool flag_name          = m_out_flags & FILESELECT_NAME;
         bool flag_suffix        = m_out_flags & FILESELECT_SUFFIX;
-        ImGui::TextUnformatted("  Folder Name"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_path", &flag_folder);
-        ImGui::TextUnformatted("    File Name"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_name", &flag_name);
-        ImGui::TextUnformatted("  File Suffix"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_suffix", &flag_suffix);
+        ImGui::TextUnformatted("  Folder Name"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_path", &flag_folder);
+        ImGui::TextUnformatted("    File Name"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_name", &flag_name);
+        ImGui::TextUnformatted("  File Suffix"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_suffix", &flag_suffix);
         m_out_flags = 0;
         if (flag_folder)    m_out_flags |= FILESELECT_FOLDER;
         if (flag_name)      m_out_flags |= FILESELECT_NAME;
@@ -113,15 +114,22 @@ struct FileSelectNode final : Node
                 m_FilePath.SetValue(m_file_path);
                 m_FullPath.SetValue(m_file_path_name);
                 m_needReload = true;
+                changed = true;
             }
             // close
             ImGuiFileDialog::Instance()->Close();
         }
         ImGui::SameLine(0);
         ImGui::TextUnformatted(m_file_name.c_str());
-        m_bookmark = ImGuiFileDialog::Instance()->SerializeBookmarks();
+        auto bookmark = ImGuiFileDialog::Instance()->SerializeBookmarks();
+        if (m_bookmark != bookmark)
+        {
+            m_bookmark = bookmark;
+            changed = true;
+        }
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
             io.ConfigViewportsNoDecoration = false;
+        return changed;
     }
 
     bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key, bool embedded) override

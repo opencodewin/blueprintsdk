@@ -102,9 +102,10 @@ struct ToStringNode final : Node
         return m_Name;
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         auto type = m_Value.GetValueType();
+        bool changed = false;
         switch (type)
         {
             case PinType::Void:
@@ -117,17 +118,18 @@ struct ToStringNode final : Node
             break;
             case PinType::Int32:
             case PinType::Int64:
-                ImGui::RadioButton("Decimal", &m_format_type, FORMAT_TYPE_NONE); ImGui::SameLine();
-                ImGui::RadioButton("Hex", &m_format_type, FORMAT_TYPE_HEX); ImGui::SameLine();
-                ImGui::RadioButton("Unsigned", &m_format_type, FORMAT_TYPE_UNSIGNED);
-                if (m_format_type != FORMAT_TYPE_HEX) ImGui::InputInt("Max Zero Prefix", &m_zero_count);
+                changed |= ImGui::RadioButton("Decimal", &m_format_type, FORMAT_TYPE_NONE); ImGui::SameLine();
+                changed |= ImGui::RadioButton("Hex", &m_format_type, FORMAT_TYPE_HEX); ImGui::SameLine();
+                changed |= ImGui::RadioButton("Unsigned", &m_format_type, FORMAT_TYPE_UNSIGNED);
+                if (m_format_type != FORMAT_TYPE_HEX) changed |= ImGui::InputInt("Max Zero Prefix", &m_zero_count);
             break;
             case PinType::Float:
             case PinType::Double:
-                ImGui::InputInt("Floating decimal", &m_floating_decimal);
+                changed |= ImGui::InputInt("Floating decimal", &m_floating_decimal);
             break;
             default:              break;
         }
+        return changed;
     }
 
     void SetType(PinType type)

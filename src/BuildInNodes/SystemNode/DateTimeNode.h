@@ -64,10 +64,10 @@ struct DateTimeNode final : Node
         return m_Exit;
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // Draw Set Node Name
-        Node::DrawSettingLayout(ctx);
+        auto changed = Node::DrawSettingLayout(ctx);
         ImGui::Separator();
 
         // Draw Custom Setting
@@ -85,19 +85,19 @@ struct DateTimeNode final : Node
         bool flag_count         = m_out_flags & DATETIME_COUNT;
         bool flag_count_float   = m_out_flags & DATETIME_COUNT_FLOAT;
         ImGui::SetCurrentContext(ctx);
-        ImGui::TextUnformatted("        Year"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_year", &flag_year);
-        ImGui::TextUnformatted("       Month"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_month", &flag_month);
-        ImGui::TextUnformatted(" Day of Year"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_year_day", &flag_year_day);
-        ImGui::TextUnformatted("Day of Month"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_month_day", &flag_month_day);
-        ImGui::TextUnformatted(" Day of Week"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_week_day", &flag_week_day);
-        ImGui::TextUnformatted("        Hour"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_hour", &flag_hour);
-        ImGui::TextUnformatted("      Minute"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_min", &flag_min);
-        ImGui::TextUnformatted("      Second"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_sec", &flag_sec);
-        ImGui::TextUnformatted(" MilliSecond"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_msec", &flag_msec);
-        ImGui::TextUnformatted(" MicroSecond"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_usec", &flag_usec);
-        ImGui::TextUnformatted("        Zone"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_zone", &flag_zone);
-        ImGui::TextUnformatted("       Count"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_count", &flag_count);
-        ImGui::TextUnformatted(" Count Float"); ImGui::SameLine(0.f, 100.f); ImGui::ToggleButton("##toggle_count_float", &flag_count_float);
+        ImGui::TextUnformatted("        Year"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_year", &flag_year);
+        ImGui::TextUnformatted("       Month"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_month", &flag_month);
+        ImGui::TextUnformatted(" Day of Year"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_year_day", &flag_year_day);
+        ImGui::TextUnformatted("Day of Month"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_month_day", &flag_month_day);
+        ImGui::TextUnformatted(" Day of Week"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_week_day", &flag_week_day);
+        ImGui::TextUnformatted("        Hour"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_hour", &flag_hour);
+        ImGui::TextUnformatted("      Minute"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_min", &flag_min);
+        ImGui::TextUnformatted("      Second"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_sec", &flag_sec);
+        ImGui::TextUnformatted(" MilliSecond"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_msec", &flag_msec);
+        ImGui::TextUnformatted(" MicroSecond"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_usec", &flag_usec);
+        ImGui::TextUnformatted("        Zone"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_zone", &flag_zone);
+        ImGui::TextUnformatted("       Count"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_count", &flag_count);
+        ImGui::TextUnformatted(" Count Float"); ImGui::SameLine(0.f, 100.f); changed |= ImGui::ToggleButton("##toggle_count_float", &flag_count_float);
         m_out_flags = 0;
         if (flag_year)      m_out_flags |= DATETIME_YEAR;
         if (flag_month)     m_out_flags |= DATETIME_MONTH;
@@ -113,6 +113,7 @@ struct DateTimeNode final : Node
         if (flag_count)     m_out_flags |= DATETIME_COUNT;
         if (flag_count_float)m_out_flags |= DATETIME_COUNT_FLOAT;
         BuildOutputPin();
+        return changed;
     }
 
     int Load(const imgui_json::value& value) override

@@ -299,12 +299,15 @@ void NodeSettingDialog::Show(BluePrintUI& UI)
         ImGui::Text("Setting"); ImGui::SameLine();
         ImGui::Text("%" PRI_node "\n", FMT_node(node));
         ImGui::Separator();
-        node->DrawSettingLayout(ImGui::GetCurrentContext());
+        auto changed = node->DrawSettingLayout(ImGui::GetCurrentContext());
         ImGui::Separator();
         if (ImGui::Button("OK", ImVec2(120, 0))) 
         {
-            UI.File_MarkModified();
-            ed::SetNodeChanged(node->m_ID);
+            if (changed)
+            {
+                UI.File_MarkModified();
+                ed::SetNodeChanged(node->m_ID);
+            }
             ImGui::CloseCurrentPopup();
             if (UI.m_CallBacks.BluePrintOnChanged)
             {
@@ -4570,7 +4573,15 @@ void BluePrintUI::ShowSettingPanel(bool* show)
             ImGui::PopStyleColor(4);
             if (tree_open)
             {
-                node->DrawSettingLayout(ImGui::GetCurrentContext());
+                if (node->DrawSettingLayout(ImGui::GetCurrentContext()))
+                {
+                    File_MarkModified();
+                    ed::SetNodeChanged(node->m_ID);
+                    if (m_CallBacks.BluePrintOnChanged)
+                    {
+                        m_CallBacks.BluePrintOnChanged(BP_CB_SETTING_CHANGED, m_Document->m_Name, m_UserHandle);
+                    }
+                }
                 ImGui::TreePop();
             }
             ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1,1,1,1));

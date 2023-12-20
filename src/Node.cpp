@@ -454,11 +454,11 @@ bool Node::IsSelected()
     return ed::IsNodeSelected(m_ID);
 }
 
-void Node::DrawSettingLayout(ImGuiContext * ctx)
+bool Node::DrawSettingLayout(ImGuiContext * ctx)
 {
     // Draw Setting
     if (ctx) ImGui::SetCurrentContext(ctx); // External Node must set context
-    
+    bool changed = false;
     ImGui::TextUnformatted("Node Name:"); ImGui::SameLine(0.f, 50.f);
     string value = m_Name;
     if (ImGui::InputText("##node_name_string_value", (char*)value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackEdit | ImGuiInputTextFlags_CallbackResize, [](ImGuiInputTextCallbackData* data) -> int
@@ -484,8 +484,10 @@ void Node::DrawSettingLayout(ImGuiContext * ctx)
         {
             m_Name = value;
             ed::SetNodeChanged(m_ID);
+            changed = true;
         }
     }
+    return changed;
 }
 
 void Node::DrawMenuLayout(ImGuiContext * ctx)
@@ -541,23 +543,25 @@ bool Node::DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui
     return false;
 }
 
-void Node::DrawDataTypeSetting(const char * label, ImDataType& type, bool full_type)
+bool Node::DrawDataTypeSetting(const char * label, ImDataType& type, bool full_type)
 {
+    auto changed = false;
     ImGui::TextUnformatted(label); ImGui::SameLine();
-    ImGui::RadioButton("AsInput", (int *)&type, (int)IM_DT_UNDEFINED); ImGui::SameLine();
+    changed |= ImGui::RadioButton("AsInput", (int *)&type, (int)IM_DT_UNDEFINED); ImGui::SameLine();
     auto pos = ImGui::GetCursorPos();
-    ImGui::RadioButton("Int8",    (int *)&type, (int)IM_DT_INT8); ImGui::SameLine();
-    ImGui::RadioButton("Int16",   (int *)&type, (int)IM_DT_INT16); ImGui::SameLine();
-    ImGui::RadioButton("Float16", (int *)&type, (int)IM_DT_FLOAT16); ImGui::SameLine();
-    ImGui::RadioButton("Float32", (int *)&type, (int)IM_DT_FLOAT32);
+    changed |= ImGui::RadioButton("Int8",    (int *)&type, (int)IM_DT_INT8); ImGui::SameLine();
+    changed |= ImGui::RadioButton("Int16",   (int *)&type, (int)IM_DT_INT16); ImGui::SameLine();
+    changed |= ImGui::RadioButton("Float16", (int *)&type, (int)IM_DT_FLOAT16); ImGui::SameLine();
+    changed |= ImGui::RadioButton("Float32", (int *)&type, (int)IM_DT_FLOAT32);
     if (full_type)
     {
         ImGui::SetCursorPosX(pos.x);
-        ImGui::RadioButton("Int16BE", (int *)&type, (int)IM_DT_INT16_BE); ImGui::SameLine();
-        ImGui::RadioButton("Int32",   (int *)&type, (int)IM_DT_INT32); ImGui::SameLine();
-        ImGui::RadioButton("Int64",   (int *)&type, (int)IM_DT_INT64); ImGui::SameLine();
-        ImGui::RadioButton("Float64", (int *)&type, (int)IM_DT_FLOAT64);
+        changed |= ImGui::RadioButton("Int16BE", (int *)&type, (int)IM_DT_INT16_BE); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Int32",   (int *)&type, (int)IM_DT_INT32); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Int64",   (int *)&type, (int)IM_DT_INT64); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Float64", (int *)&type, (int)IM_DT_FLOAT64);
     }
+    return changed;
 }
 
 LinkQueryResult Node::AcceptLink(const Pin& receiver, const Pin& provider) const

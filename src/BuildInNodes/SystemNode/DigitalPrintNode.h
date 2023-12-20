@@ -93,13 +93,13 @@ struct PrintNode final : Node
         value["text_color"] = imgui_json::number(ImGui::GetColorU32(m_text_color));
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // Draw Setting
         ImGui::SetCurrentContext(ctx); // External Node must set context
 
         // Draw Set Node Name
-        Node::DrawSettingLayout(ctx);
+        auto changed = Node::DrawSettingLayout(ctx);
         ImGui::Separator();
 
         // Custom Node Setting
@@ -115,6 +115,7 @@ struct PrintNode final : Node
         ImGui::Text("Text Color:");
         ImGui::SameLine();
         ImGui::ColorEdit4("##TextColor##PrintNode", (float*)&m_text_color, misc_flags);
+        return changed;
     }
 
     static string ReplaceDigital(const string str)

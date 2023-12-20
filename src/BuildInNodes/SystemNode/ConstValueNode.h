@@ -13,16 +13,17 @@ struct ConstValueNode final : Node
         m_HasCustomLayout = true;
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // We don't set node name for this Node
         // Draw Custom Setting
-        ImGui::RadioButton("Bool", (int *)&m_pintype, (int)PinType::Bool); ImGui::SameLine();
-        ImGui::RadioButton("Int32", (int *)&m_pintype, (int)PinType::Int32); ImGui::SameLine();
-        ImGui::RadioButton("Int64", (int *)&m_pintype, (int)PinType::Int64); ImGui::SameLine();
-        ImGui::RadioButton("Float", (int *)&m_pintype, (int)PinType::Float); ImGui::SameLine();
-        ImGui::RadioButton("Double", (int *)&m_pintype, (int)PinType::Double); ImGui::SameLine();
-        ImGui::RadioButton("String", (int *)&m_pintype, (int)PinType::String);
+        bool changed = false;
+        changed |= ImGui::RadioButton("Bool", (int *)&m_pintype, (int)PinType::Bool); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Int32", (int *)&m_pintype, (int)PinType::Int32); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Int64", (int *)&m_pintype, (int)PinType::Int64); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Float", (int *)&m_pintype, (int)PinType::Float); ImGui::SameLine();
+        changed |= ImGui::RadioButton("Double", (int *)&m_pintype, (int)PinType::Double); ImGui::SameLine();
+        changed |= ImGui::RadioButton("String", (int *)&m_pintype, (int)PinType::String);
         SetType(m_pintype);
         ImGui::Separator();
         switch (m_pintype)
@@ -33,6 +34,7 @@ struct ConstValueNode final : Node
                 if (ImGui::Checkbox("##bool_value", &m_value_bool))
                 {
                     m_Value.SetValue(m_value_bool);
+                    changed = true;
                 }
             }
             break;
@@ -42,6 +44,7 @@ struct ConstValueNode final : Node
                 if (ImGui::InputInt("##int32_value", &m_value_int32))
                 {
                     m_Value.SetValue(m_value_int32);
+                    changed = true;
                 }
             }
             break;
@@ -51,6 +54,7 @@ struct ConstValueNode final : Node
                 if (ImGui::InputInt64("##int64_value", &m_value_int64))
                 {
                     m_Value.SetValue(m_value_int64);
+                    changed = true;
                 }
             }
             break;
@@ -60,6 +64,7 @@ struct ConstValueNode final : Node
                 if (ImGui::InputFloat("##float_value", &m_value_float))
                 {
                     m_Value.SetValue(m_value_float);
+                    changed = true;
                 }
             }
             break;
@@ -69,6 +74,7 @@ struct ConstValueNode final : Node
                 if (ImGui::InputDouble("##double_value", &m_value_double))
                 {
                     m_Value.SetValue(m_value_double);
+                    changed = true;
                 }
             }
             break;
@@ -95,12 +101,14 @@ struct ConstValueNode final : Node
                 {
                     m_value_string.resize(strlen(m_value_string.c_str()));
                     m_Value.SetValue(m_value_string);
+                    changed = true;
                 }
             }
             break;
             default:
             break;
         }
+        return changed;
     }
 
     bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key, bool embedded) override

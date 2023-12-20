@@ -67,15 +67,16 @@ struct TimerNode final : Node
         return {};
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // Draw Set Node Name
-        Node::DrawSettingLayout(ctx);
+        auto changed = Node::DrawSettingLayout(ctx);
         ImGui::Separator();
 
         // Draw Custom setting
-        ImGui::InputInt("Timer interval", (int *)&m_interval_ms);
-        ImGui::InputInt("Timer count", &m_count);
+        changed |= ImGui::InputInt("Timer interval", (int *)&m_interval_ms);
+        changed |= ImGui::InputInt("Timer count", &m_count);
+        return changed;
     }
 
     int Load(const imgui_json::value& value) override

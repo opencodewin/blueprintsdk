@@ -88,21 +88,22 @@ struct ComparatorNode final : Node
         return m_False;
     }
 
-    void DrawSettingLayout(ImGuiContext * ctx) override
+    bool DrawSettingLayout(ImGuiContext * ctx) override
     {
         // Draw Setting
         ImGui::SetCurrentContext(ctx); // External Node must set context
 
         // Draw Set Node Name
-        Node::DrawSettingLayout(ctx);
+        auto changed = Node::DrawSettingLayout(ctx);
         ImGui::Separator();
 
-        ImGui::RadioButton("==", (int *)&m_CompareType, Equal); ImGui::SameLine();
-        ImGui::RadioButton(">", (int *)&m_CompareType, Greater); ImGui::SameLine();
-        ImGui::RadioButton("<", (int *)&m_CompareType, Less); ImGui::SameLine();
-        ImGui::RadioButton(">=", (int *)&m_CompareType, GreaterEqual); ImGui::SameLine();
-        ImGui::RadioButton("<=", (int *)&m_CompareType, LessEqual); ImGui::SameLine();
-        ImGui::RadioButton("!=", (int *)&m_CompareType, NotEqual);
+        changed |= ImGui::RadioButton("==", (int *)&m_CompareType, Equal); ImGui::SameLine();
+        changed |= ImGui::RadioButton(">", (int *)&m_CompareType, Greater); ImGui::SameLine();
+        changed |= ImGui::RadioButton("<", (int *)&m_CompareType, Less); ImGui::SameLine();
+        changed |= ImGui::RadioButton(">=", (int *)&m_CompareType, GreaterEqual); ImGui::SameLine();
+        changed |= ImGui::RadioButton("<=", (int *)&m_CompareType, LessEqual); ImGui::SameLine();
+        changed |= ImGui::RadioButton("!=", (int *)&m_CompareType, NotEqual);
+        return changed;
     }
 
     bool DrawCustomLayout(ImGuiContext * ctx, float zoom, ImVec2 origin, ImGui::ImCurveEdit::Curve * key, bool embedded) override
