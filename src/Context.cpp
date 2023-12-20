@@ -157,6 +157,19 @@ StepResult Context::Restep(Context * context)
     return SetStepResult(StepResult::Success);
 }
 
+StepResult Context::StepToEnd(Node* node)
+{
+    if (!node || m_Executing || m_ThreadRunning)
+    {
+        return SetStepResult(StepResult::Error);
+    }
+    m_StepToEnd = true;
+    auto stepFlowPin = (FlowPin *)node->GetAutoLinkInputFlowPin();
+    auto result = Run(*stepFlowPin);
+    m_StepToEnd = false;
+    return result;
+}
+
 StepResult Context::Run(FlowPin& entryPoint)
 {
     m_Executing = true;

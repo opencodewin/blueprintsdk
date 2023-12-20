@@ -138,6 +138,7 @@ struct IMGUI_API Context
     StepResult Start(FlowPin& entryPoint);
     StepResult Step(Context * context = nullptr, bool restep = false);
     StepResult Restep(Context * context = nullptr);
+    StepResult StepToEnd(Node* node = nullptr);
     
     StepResult Run(FlowPin& entryPoint);        // non-thread run, blocking mode
     StepResult Execute(FlowPin& entryPoint);

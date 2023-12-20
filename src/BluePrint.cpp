@@ -424,7 +424,12 @@ StepResult BP::Current()
 
 StepResult BP::StepToEnd(Node * node)
 {
-    return m_Context.ThreadStepToEnd(node);
+    if (m_Context.m_ThreadRunning)
+        return m_Context.ThreadStepToEnd(node);
+    else if (!m_Context.m_Executing)
+        return m_Context.StepToEnd(node);
+    else
+        return BluePrint::StepResult::Done;
 }
 
 bool BP::IsExecuting()
