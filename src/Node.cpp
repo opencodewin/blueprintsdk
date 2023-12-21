@@ -459,6 +459,7 @@ bool Node::DrawSettingLayout(ImGuiContext * ctx)
     // Draw Setting
     if (ctx) ImGui::SetCurrentContext(ctx); // External Node must set context
     bool changed = false;
+    ImGui::PushID(m_ID);
     ImGui::TextUnformatted("Node Name:"); ImGui::SameLine(0.f, 50.f);
     string value = m_Name;
     if (ImGui::InputText("##node_name_string_value", (char*)value.data(), value.size() + 1, ImGuiInputTextFlags_CallbackEdit | ImGuiInputTextFlags_CallbackResize, [](ImGuiInputTextCallbackData* data) -> int
@@ -487,6 +488,8 @@ bool Node::DrawSettingLayout(ImGuiContext * ctx)
             changed = true;
         }
     }
+    changed |= ImGui::SliderFloat("Transparency", &m_Transparency, 0.f, 1.f);
+    ImGui::PopID();
     return changed;
 }
 
@@ -621,6 +624,12 @@ int Node::Load(const imgui_json::value& value)
         if (val.is_boolean())
             m_Enabled = val.get<imgui_json::boolean>();
     }
+    if (value.contains("transparency"))
+    { 
+        auto& val = value["transparency"];
+        if (val.is_number())
+            m_Transparency = val.get<imgui_json::number>();
+    }
 
     string nodeVersion;
     if (imgui_json::GetTo<imgui_json::string>(value, "version", nodeVersion)) // optional
@@ -698,6 +707,7 @@ void Node::Save(imgui_json::value& value, std::map<ID_TYPE, ID_TYPE> MapID)
     value["name"] = imgui_json::string(m_Name); // required
     value["enabled"] = imgui_json::boolean(m_Enabled);
     value["break_point"] = m_BreakPoint;
+    value["transparency"] = imgui_json::number(m_Transparency);
     value["type"] = NodeTypeToString(GetType());
     value["style"] = NodeStyleToString(GetStyle());
     value["catalog"] = GetCatalog();

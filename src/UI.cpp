@@ -1575,6 +1575,7 @@ void BluePrintUI::DrawNodes()
 #endif
         if (node->m_NoBackGround)
             ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.f, 0.f, 0.f, 0.f));
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.f - node->m_Transparency);
         ed::BeginNode(node->m_ID);
         // Default node layout:                         Simple node layout:
         //
@@ -1777,6 +1778,7 @@ void BluePrintUI::DrawNodes()
 #if DEBUG_NODE_DRAWING
         ImGui::Debug_DrawItemRect();
 #endif
+        ImGui::PopStyleVar();
         if (node->m_NoBackGround)
             ed::PopStyleColor();
         ed::EndNode();
