@@ -1710,7 +1710,7 @@ void BluePrintUI::DrawNodes()
                 if (m_CallBacks.BluePrintOnChanged)
                 {
                     auto callback_ret = m_CallBacks.BluePrintOnChanged(BP_CB_PARAM_CHANGED, m_Document->m_Name, m_UserHandle);
-                    if (callback_ret == BP_CBR_RunAgain && m_Document->m_Blueprint.IsPaused())
+                    if (callback_ret == BP_CBR_RunAgain)
                     {
                         m_Document->m_Blueprint.StepToEnd(node);
                     }
