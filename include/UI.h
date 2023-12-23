@@ -44,7 +44,7 @@
 #define ICON_RESET              u8"\ue4e0"
 #define ICON_RESET_ALL          u8"\ue627"
 #define ICON_THUMBNAIL          u8"\ue8d9"
-#define ICON_SETTING_PANEL      u8"\ue9c8"
+#define ICON_SETTING_PANEL      u8"\uebbf"
 #else
 #define ICON_OPEN_BLUEPRINT     "Open"
 #define ICON_NEW_BLUEPRINT      "New"

@@ -594,8 +594,8 @@ void BluePrintUI::Initialize(const char * bp_file)
     if (bp_file)
     {
         m_Document->Load(bp_file);
-        //if (m_Document->Load(bp_file) != BP_ERR_NONE)
-        //    CreateNewDocument();
+        if (m_Document->Load(bp_file) != BP_ERR_NONE)
+            CreateNewDocument();
     }
 
     if (bp_file) m_Document->SetPath(bp_file);
@@ -2193,8 +2193,14 @@ void BluePrintUI::FileDialogs()
     auto viewport = ImGui::GetWindowViewport();
     ImVec2 maxSize = viewport->Size;
     ImVec2 minSize = maxSize * 0.5f;
+     // modify by dicky, if using multiviewport, make sure we display on top
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
         io.ConfigViewportsNoDecoration = true;
+        const ImGuiViewportP* viewport = (ImGuiViewportP*) ImGui::GetWindowViewport();
+        ImGui::SetNextWindowViewport(viewport->ID);
+    }
+    // modify by dicky end
     if (m_FileDialog.Display("##OpenFileDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
     {
         if (m_FileDialog.IsOk())
@@ -4564,7 +4570,7 @@ void BluePrintUI::ShowSettingPanel(bool* show)
             std::string lable_id = label_name + "##node_setting" + "@" + std::to_string(node->m_ID);
             auto node_pos = ImGui::GetCursorScreenPos();
             node->DrawNodeLogo(ImGui::GetCurrentContext(), ImVec2(60, 30));
-            ImGui::SameLine(40);
+            ImGui::SameLine(60);
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0));
             ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.5, 0.5, 0.0, 0.5));
             ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.2, 0.5, 0.2, 0.5));
