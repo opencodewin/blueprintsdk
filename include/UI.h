@@ -224,7 +224,7 @@ typedef struct BluePrintCallbackFunctions
 
 } BluePrintCallbackFunctions;
 
-struct BluePrintUI
+struct IMGUI_API BluePrintUI
 {
     static void LoadPlugins(const std::vector<std::string>& pluginPaths, int& current_index, std::string& current_message, float& loading_percentage, int expect_count);
     static int CheckPlugins(const std::vector<std::string>& pluginPaths);
@@ -234,12 +234,12 @@ struct BluePrintUI
     bool Frame(bool child_window = false, bool show_node = true, bool bp_enabled = true, uint32_t flag = BluePrintFlag::BluePrintFlag_All);
     void SetStyle(enum BluePrintStyle style = BluePrintStyle::BP_Style_BluePrint);
     void SetCallbacks(BluePrintCallbackFunctions callbacks, void * handle);
+    void Resume();  // APP level cancelled File_Exit
     
     ed::Config                      m_Config;
     ed::EditorContext*              m_Editor {nullptr};
     unique_ptr<Document>            m_Document {nullptr};
     imgui_json::value               m_OpRecord;
-    ImGuiFileDialog                 m_FileDialog;
     std::string                     m_BookMarkPath;
     std::vector<ClipNode>           m_ClipBoard;
     bool                            m_isNewNodePopuped {false};
@@ -383,7 +383,6 @@ private:
     void                HandleCreateAction(uint32_t flag = BluePrintFlag::BluePrintFlag_All);
     void                HandleDestroyAction();
     void                HandleContextMenuAction(uint32_t flag = BluePrintFlag::BluePrintFlag_All);
-    void                InitFileDialog(const char * bookmark_path = nullptr);
     void                BeginOpRecord(const std::string& opName);
     void                EndOpRecord();
     void                ClearOpRecord();

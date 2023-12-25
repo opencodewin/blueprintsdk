@@ -606,7 +606,6 @@ void BluePrintUI::Initialize(const char * bp_file)
     std::string theme = ed::GetTheme();
     SetStyle(BPStyleFromName(theme));
     ed::SetCurrentEditor(nullptr);
-    InitFileDialog();
 #if !defined(__EMSCRIPTEN__)
     m_ClipBoard.clear();
 #endif
@@ -623,12 +622,15 @@ void BluePrintUI::Finalize()
     if (m_DebugOverlay) { delete m_DebugOverlay; m_DebugOverlay = nullptr; }
 #ifdef USE_BOOKMARK
 	// save bookmarks
-	std::ofstream configFileWriter(m_BookMarkPath, std::ios::out);
-	if (!configFileWriter.bad())
-	{
-		configFileWriter << m_FileDialog.SerializeBookmarks();
-		configFileWriter.close();
-	}
+    if (!m_BookMarkPath.empty())
+    {
+        std::ofstream configFileWriter(m_BookMarkPath, std::ios::out);
+        if (!configFileWriter.bad())
+        {
+            configFileWriter << ImGuiFileDialog::Instance()->SerializeBookmarks();
+            configFileWriter.close();
+        }
+    }
 #endif
 }
 
@@ -641,7 +643,7 @@ void BluePrintUI::SetStyle(enum BluePrintStyle style)
         {
             ImGui::StyleColorsDark();
             if (m_Document) m_Document->m_Blueprint.SetStyleLight(false);
-            m_FileDialog.SetDarkStyle();
+            ImGuiFileDialog::Instance()->SetDarkStyle();
             m_StyleColors[BluePrintStyleColor_TitleBg]              = ImColor(255, 255, 255,  64);
             m_StyleColors[BluePrintStyleColor_TitleBgDummy]         = ImColor(255,   0,   0,  64);
             m_StyleColors[BluePrintStyleColor_GroupBg]              = ImColor(128, 128, 128, 128);
@@ -681,7 +683,7 @@ void BluePrintUI::SetStyle(enum BluePrintStyle style)
         {
             ImGui::StyleColorsLight();
             if (m_Document) m_Document->m_Blueprint.SetStyleLight(true);
-            m_FileDialog.SetDarkStyle();
+            ImGuiFileDialog::Instance()->SetDarkStyle();
             m_StyleColors[BluePrintStyleColor_GroupBg]              = ImColor(128, 128, 255, 128);
             m_StyleColors[BluePrintStyleColor_TitleBg]              = ImColor(128, 128, 255,  64);
             m_StyleColors[BluePrintStyleColor_ToolButtonActive]     = ImColor( 96,  96, 255, 192);
@@ -716,7 +718,7 @@ void BluePrintUI::SetStyle(enum BluePrintStyle style)
     case BluePrintStyle::BP_Style_Mono:
         {
             ImGui::StyleColorsLight();
-            m_FileDialog.SetLightStyle();
+            ImGuiFileDialog::Instance()->SetLightStyle();
             if (m_Document) m_Document->m_Blueprint.SetStyleLight(true);
             m_StyleColors[BluePrintStyleColor_GroupBg]              = ImColor(196, 196, 196, 196);
             m_StyleColors[BluePrintStyleColor_TitleBg]              = ImColor(128, 128, 128,  64);
@@ -760,6 +762,11 @@ void BluePrintUI::SetCallbacks(BluePrintCallbackFunctions callbacks, void * hand
 {
     m_CallBacks = callbacks;
     m_UserHandle = handle;
+}
+
+void BluePrintUI::Resume()
+{
+    ReadyToQuit = false;
 }
 
 bool BluePrintUI::Frame(bool child_window, bool show_node, bool bp_enabled, uint32_t flag)
@@ -1130,7 +1137,7 @@ float BluePrintUI::DrawNodeToolBar(Node *node, Node **need_clone_node)
         }
         if (ImGui::IsItemHovered()) node->m_IconHovered = 3;
     }
-    if (!m_ShowSettingPanel && node->m_HasSetting)
+    if ((!m_ShowSettingPanel || node->GetStyle() == NodeStyle::Group || node->GetStyle() == NodeStyle::Comment) && node->m_HasSetting)
     {
         icon_offset += icon_gap;
         ImGui::SetCursorScreenPos(current_pos + ImVec2(node_size.x - icon_offset, 8));
@@ -2181,7 +2188,7 @@ void BluePrintUI::ShowDialogs()
     m_LinkContextMenu.Show(*this);
     m_NodeDeleteDialog.Show(*this);
     m_NodeCreateDialog.Show(*this);
-    if (!m_ShowSettingPanel) m_NodeSettingDialog.Show(*this);
+    m_NodeSettingDialog.Show(*this);
     ed::Resume();
 }
 
@@ -2201,24 +2208,24 @@ void BluePrintUI::FileDialogs()
         ImGui::SetNextWindowViewport(viewport->ID);
     }
     // modify by dicky end
-    if (m_FileDialog.Display("##OpenFileDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
+    if (ImGuiFileDialog::Instance()->Display("##BlueprintUI##OpenFileDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
     {
-        if (m_FileDialog.IsOk())
+        if (ImGuiFileDialog::Instance()->IsOk())
         {
             string error;
-            auto filePathName = m_FileDialog.GetFilePathName();
+            auto filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             if (!File_Open(filePathName, &error) && !error.empty())
             {
                 LOGE("%s", error.c_str());
             }
         }
-        m_FileDialog.Close();
+        ImGuiFileDialog::Instance()->Close();
     }
-    if (m_FileDialog.Display("##SaveFileDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
+    if (ImGuiFileDialog::Instance()->Display("##BlueprintUI##SaveFileDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
 	{
-        if (m_FileDialog.IsOk())
+        if (ImGuiFileDialog::Instance()->IsOk())
 		{
-            auto filePathName = m_FileDialog.GetFilePathName();
+            auto filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             if (!File_SaveAsEx(filePathName))
             {
                 LOGE("Save file failed %s", filePathName.c_str());
@@ -2233,34 +2240,34 @@ void BluePrintUI::FileDialogs()
                 }
             }
         }
-        m_FileDialog.Close();
+        ImGuiFileDialog::Instance()->Close();
     }
-    if (m_FileDialog.Display("##SaveGroupDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
+    if (ImGuiFileDialog::Instance()->Display("##BlueprintUI##SaveGroupDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
     {
-        if (m_FileDialog.IsOk())
+        if (ImGuiFileDialog::Instance()->IsOk())
 		{
-            GroupNode * node = (GroupNode *)m_FileDialog.GetUserDatas();
-            auto filePathName = m_FileDialog.GetFilePathName();
+            GroupNode * node = (GroupNode *)ImGuiFileDialog::Instance()->GetUserDatas();
+            auto filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
             if (node)
             {
                 node->SaveGroup(filePathName);
             }
         }
-        m_FileDialog.Close();
+        ImGuiFileDialog::Instance()->Close();
     }
-    if (m_FileDialog.Display("##ImportGroupDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
+    if (ImGuiFileDialog::Instance()->Display("##BlueprintUI##ImportGroupDlgKey", ImGuiWindowFlags_NoCollapse, minSize, maxSize))
     {
-        if (m_FileDialog.IsOk())
+        if (ImGuiFileDialog::Instance()->IsOk())
         {
             string error;
-            auto filePathName = m_FileDialog.GetFilePathName();
-            ImVec2 * pos = (ImVec2 *)m_FileDialog.GetUserDatas();
+            auto filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            ImVec2 * pos = (ImVec2 *)ImGuiFileDialog::Instance()->GetUserDatas();
             if (!File_Import(filePathName, *pos, &error) && !error.empty())
             {
                 LOGE("%s", error.c_str());
             }
         }
-        m_FileDialog.Close();
+        ImGuiFileDialog::Instance()->Close();
     }
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         io.ConfigViewportsNoDecoration = false;
@@ -2986,22 +2993,6 @@ void BluePrintUI::File_MarkModified()
     m_Document->m_IsModified = true;
 }
 
-void BluePrintUI::InitFileDialog(const char * bookmark_path)
-{
-#ifdef USE_BOOKMARK
-	// load bookmarks
-	m_BookMarkPath = bookmark_path ? std::string(bookmark_path) : "";
-	std::ifstream docFile(bookmark_path, std::ios::in);
-	if (docFile.is_open())
-	{
-		std::stringstream strStream;
-		strStream << docFile.rdbuf();//read the file
-		m_FileDialog.DeserializeBookmarks(strStream.str());
-		docFile.close();
-	}
-#endif
-}
-
 Node* BluePrintUI::FindEntryPointNode()
 {
     for (auto& node : m_Document->m_Blueprint.GetNodes())
@@ -3134,8 +3125,8 @@ bool BluePrintUI::File_Open(std::string path, string* error)
     {
         auto mostRecentlyOpenFiles = ImGui::MostRecentlyUsedList("BluePrintOpenList");
         mostRecentlyOpenFiles.Add(path);
+        m_Document->SetPath(path);
     }
-    //m_Document->SetPath(path);
     m_Document->OnMakeCurrent();
     if (m_DebugOverlay) m_DebugOverlay->Init(&m_Document->m_Blueprint);
     return true;
@@ -3147,7 +3138,7 @@ bool BluePrintUI::File_Open()
     std::string filePathName;
     const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_None | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
     const char *filters = "Blue print file (*.json *.bp){.json,.bp},.*";
-    m_FileDialog.OpenDialog("##OpenFileDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, ".", 1, nullptr, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##OpenFileDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, ".", 1, nullptr, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
     return result;
 }
 
@@ -3176,7 +3167,7 @@ bool BluePrintUI::File_Import()
     std::string filePathName;
     const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_None | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
     const char *filters = "Group file (*.group *.gp){.group,.gp},.*";
-    m_FileDialog.OpenDialog("##ImportGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, ".", 1, &m_PopupMousePos, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##ImportGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, ".", 1, &m_PopupMousePos, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
     return result;
 }
 
@@ -3189,7 +3180,9 @@ bool BluePrintUI::File_New()
     CleanStateStorage();
     ed::NavigateToOrigin();
     CreateNewDocument();
+    m_Document->m_Path = "";
     m_Document->m_Name = "NONAMED";
+    m_Document->m_IsModified = true;
     if (m_DebugOverlay) m_DebugOverlay->Init(&m_Document->m_Blueprint);
     //ed::SetCurrentEditor(nullptr);
     return true;
@@ -3298,7 +3291,7 @@ bool BluePrintUI::File_SaveAs()
     auto viewport = ImGui::GetWindowViewport();
     ImVec2 maxSize = viewport->Size;
 	ImVec2 minSize = maxSize * 0.5f;
-    m_FileDialog.OpenDialog("##SaveFileDlgKey", ICON_IGFD_FOLDER_OPEN " Save File", filters, ".", 1, nullptr, m_BookMarkPath.empty() ? pflags : pflags |ImGuiFileDialogFlags_ShowBookmark);
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##SaveFileDlgKey", ICON_IGFD_FOLDER_OPEN " Save File", filters, ".", 1, nullptr, m_BookMarkPath.empty() ? pflags : pflags |ImGuiFileDialogFlags_ShowBookmark);
     return true;
 }
 
@@ -4174,7 +4167,7 @@ bool BluePrintUI::File_Export(Node * group_node)
     auto viewport = ImGui::GetWindowViewport();
     ImVec2 maxSize = viewport->Size;
 	ImVec2 minSize = maxSize * 0.5f;
-    m_FileDialog.OpenDialog("##SaveGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Save Group File", filters, ".", 1, group_node, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##SaveGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Save Group File", filters, ".", 1, group_node, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
     return true;
 }
 
@@ -4566,6 +4559,8 @@ void BluePrintUI::ShowSettingPanel(bool* show)
             auto type = node->GetTypeInfo().m_Type;
             if (type == BluePrint::NodeType::EntryPoint || type == BluePrint::NodeType::ExitPoint)
                 continue;
+            if (!node->IsSelected())
+                continue;
             auto label_name = node->m_Name;
             std::string lable_id = label_name + "##node_setting" + "@" + std::to_string(node->m_ID);
             auto node_pos = ImGui::GetCursorScreenPos();
@@ -4576,7 +4571,7 @@ void BluePrintUI::ShowSettingPanel(bool* show)
             ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.2, 0.5, 0.2, 0.5));
             ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.1, 0.5, 0.1, 0.5));
             ImGuiTreeNodeFlags tree_flags = ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_AllowOverlap;
-            if (node->IsSelected()) tree_flags |= ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Selected;
+            tree_flags |= ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Selected;
             bool tree_open = ImGui::TreeNodeEx(lable_id.c_str(), tree_flags);
             ImGui::PopStyleColor(4);
             if (tree_open)

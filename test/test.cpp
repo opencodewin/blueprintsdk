@@ -89,6 +89,7 @@ static void BlueprintTest_SetupContext(ImGuiContext* ctx, void * handle, bool in
         out_buf->appendf("ProjectPath=%s\n", g_blueprint_settings.project_path.c_str());
         out_buf->appendf("ShowInfoTooltips=%d\n", g_blueprint_settings.ShowInfoTooltips ? 1 : 0);
         out_buf->appendf("ShowSettingPanel=%d\n", g_blueprint_settings.ShowSettingPanel ? 1 : 0);
+        out_buf->append("\n");
     };
     setting_ini_handler.ApplyAllFn = [](ImGuiContext* ctx, ImGuiSettingsHandler* handler)
     {
@@ -100,11 +101,10 @@ static void BlueprintTest_SetupContext(ImGuiContext* ctx, void * handle, bool in
         }
     };
     ctx->SettingsHandlers.push_back(setting_ini_handler);
-
 #ifdef USE_BOOKMARK
     ImGuiSettingsHandler bookmark_ini_handler;
-    bookmark_ini_handler.TypeName = "BookMark";
-    bookmark_ini_handler.TypeHash = ImHashStr("BookMark");
+    bookmark_ini_handler.TypeName = "BookMarkBPUI";
+    bookmark_ini_handler.TypeHash = ImHashStr("BookMarkBPUI");
     bookmark_ini_handler.ReadOpenFn = [](ImGuiContext* ctx, ImGuiSettingsHandler* handler, const char* name) -> void*
     {
         return ImGuiFileDialog::Instance();
@@ -177,6 +177,7 @@ static void BlueprintTest_Finalize(void** handle)
 static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
 {
     static int32_t splash_start_time = ImGui::get_current_time_msec();
+    static bool UI_inited = false;
     auto& io = ImGui::GetIO();
     ImGuiContext& g = *GImGui;
     ImGuiCond cond = ImGuiCond_None;
@@ -187,7 +188,6 @@ static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
     ImGui::SetNextWindowSize(io.DisplaySize, cond);
     ImGui::Begin("BluePrint Splash", nullptr, flags);
     float dur = (ImGui::get_current_time_msec() - splash_start_time) / 1000.f;
-    bool title_finished = dur > 9;
     auto draw_node = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 size, float alpha)
     {
         draw_list->AddRect(pos, pos + ImVec2(size.x, 16), IM_COL32(255, 255, 255, 255 * alpha), 4, ImDrawFlags_RoundCornersTop);
@@ -205,7 +205,7 @@ static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
         ImVec2 cp4[4] = { ImVec2(pos1.x, pos1.y), ImVec2(pos1.x + sz.x * 1.1f, pos1.y + sz.y * 0.3f), ImVec2(pos1.x + sz.x - sz.x * 1.1f, pos1.y + sz.y - sz.y * 0.3f), ImVec2(pos2.x, pos2.y) };
         draw_list->AddBezierCubic(cp4[0], cp4[1], cp4[2], cp4[3], IM_COL32(128, 128, 128, 255 * alpha), 2);
     };
-    if (!title_finished)
+
     {
         auto draw_list = ImGui::GetWindowDrawList();
         float line_width = dur * io.DisplaySize.x;
@@ -313,9 +313,10 @@ static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
     else
     {
         BluePrint::BluePrintUI * UI = (BluePrint::BluePrintUI *)handle;
-        if (UI)
+        if (!UI_inited && UI)
         {
             UI->Initialize(g_blueprint_settings.project_path.c_str());
+            UI_inited = true;
         }
     }
     float percentage = std::min(g_plugin_loading_percentage, 1.0f);
@@ -325,18 +326,42 @@ static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
     ImGui::UpdateData();
 
     ImGui::End();
-    return title_finished && !g_plugin_loading;
+    return dur > 9 && !g_plugin_loading;
 }
 
 static bool BlueprintTest_Frame(void * handle, bool app_will_quit)
 {
+    static const char* buttons[] = { "Quit", "Cancel", NULL };
+    static ImGui::MsgBox msgbox_event;
+    msgbox_event.Init("Quit Editor?", ICON_MD_WARNING, "Current document is modified.\nAre you really sure you want to Quit?", buttons, false);
     BluePrint::BluePrintUI * UI = (BluePrint::BluePrintUI *)handle;
     if (!UI)
         return true;
 #ifdef USE_THUMBNAILS
 	ImGuiFileDialog::Instance()->ManageGPUThumbnails();
 #endif
-    return UI->Frame() || app_will_quit;
+    auto app_done = UI->Frame() || app_will_quit;
+    if (app_done)
+    {
+        if (UI->m_Document && UI->File_IsModified())
+        {
+            // need confirm quit
+            msgbox_event.Open();
+            app_done = false;
+        }
+    }
+
+    auto msg_ret = msgbox_event.Draw(400);
+    if (msg_ret == 1)
+    {
+        app_done = true;
+    }
+    else if (msg_ret == 2)
+    {
+        UI->Resume();
+        app_done = false;
+    }
+    return app_done;
 }
 
 void Application_Setup(ApplicationWindowProperty& property)
