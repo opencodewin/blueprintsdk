@@ -288,7 +288,7 @@ static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
             ImGui::GetWindowDrawList()->AddText(ImVec2(vxoft, vyoft), IM_COL32(255, 255, 255, 255), version_string.c_str());
 #endif
             // copyright
-            std::string copy_str = "Copyright(c) 2023 OpenCodeWin Team";
+            std::string copy_str = "Copyright(c) 2023-2024 OpenCodeWin Team";
             auto copy_size = ImGui::CalcTextSize(copy_str.c_str());
             ImGui::GetWindowDrawList()->AddText(ImVec2(io.DisplaySize.x - copy_size.x - 16, io.DisplaySize.y - 32 - 24), IM_COL32(128, 128, 255, 255), copy_str.c_str());
         }
