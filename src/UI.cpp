@@ -3135,10 +3135,13 @@ bool BluePrintUI::File_Open(std::string path, string* error)
 bool BluePrintUI::File_Open()
 {
     bool result = true;
-    std::string filePathName;
-    const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_None | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+    IGFD::FileDialogConfig config;
+    config.path = ".";
+	config.countSelectionMax = 1;
+    config.flags = ImGuiFileDialogFlags_None | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+    if (!m_BookMarkPath.empty()) config.flags |= ImGuiFileDialogFlags_ShowBookmark;
     const char *filters = "Blue print file (*.json *.bp){.json,.bp},.*";
-    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##OpenFileDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, ".", 1, nullptr, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##OpenFileDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, config);
     return result;
 }
 
@@ -3164,10 +3167,14 @@ bool BluePrintUI::File_Import(std::string path, ImVec2 pos, string* error)
 bool BluePrintUI::File_Import()
 {
     bool result = true;
-    std::string filePathName;
-    const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_None | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+    IGFD::FileDialogConfig config;
+    config.path = ".";
+    config.countSelectionMax = 1;
+    config.userDatas = &m_PopupMousePos;
+    config.flags = ImGuiFileDialogFlags_None | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+    if (!m_BookMarkPath.empty()) config.flags |= ImGuiFileDialogFlags_ShowBookmark;
     const char *filters = "Group file (*.group *.gp){.group,.gp},.*";
-    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##ImportGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, ".", 1, &m_PopupMousePos, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##ImportGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Open File", filters, config);
     return result;
 }
 
@@ -3285,13 +3292,13 @@ bool BluePrintUI::File_SaveAsEx(std::string path)
 
 bool BluePrintUI::File_SaveAs()
 {
-    const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
     const char *filters = "Blue print file (*.json *.bp){.json,.bp},.*";
-    auto& io = ImGui::GetIO();
-    auto viewport = ImGui::GetWindowViewport();
-    ImVec2 maxSize = viewport->Size;
-	ImVec2 minSize = maxSize * 0.5f;
-    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##SaveFileDlgKey", ICON_IGFD_FOLDER_OPEN " Save File", filters, ".", 1, nullptr, m_BookMarkPath.empty() ? pflags : pflags |ImGuiFileDialogFlags_ShowBookmark);
+    IGFD::FileDialogConfig config;
+    config.path = ".";
+    config.countSelectionMax = 1;
+    config.flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+    if (!m_BookMarkPath.empty()) config.flags |= ImGuiFileDialogFlags_ShowBookmark;
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##SaveFileDlgKey", ICON_IGFD_FOLDER_OPEN " Save File", filters, config);
     return true;
 }
 
@@ -4161,13 +4168,14 @@ imgui_json::value BluePrintUI::Blueprint_GetOpRecord() const
 
 bool BluePrintUI::File_Export(Node * group_node)
 {
-    const ImGuiFileDialogFlags pflags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
     const char *filters = "Group file (*.group *.gp){.group,.gp},.*";
-    auto& io = ImGui::GetIO();
-    auto viewport = ImGui::GetWindowViewport();
-    ImVec2 maxSize = viewport->Size;
-	ImVec2 minSize = maxSize * 0.5f;
-    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##SaveGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Save Group File", filters, ".", 1, group_node, m_BookMarkPath.empty() ? pflags : pflags | ImGuiFileDialogFlags_ShowBookmark);
+    IGFD::FileDialogConfig config;
+    config.path = ".";
+    config.countSelectionMax = 1;
+    config.flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+    config.userDatas = group_node;
+    if (!m_BookMarkPath.empty()) config.flags |= ImGuiFileDialogFlags_ShowBookmark;
+    ImGuiFileDialog::Instance()->OpenDialog("##BlueprintUI##SaveGroupDlgKey", ICON_IGFD_FOLDER_OPEN " Save Group File", filters, config);
     return true;
 }
 
