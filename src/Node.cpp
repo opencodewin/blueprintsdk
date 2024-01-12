@@ -488,7 +488,7 @@ bool Node::DrawSettingLayout(ImGuiContext * ctx)
             changed = true;
         }
     }
-    changed |= ImGui::SliderFloat("Transparency", &m_Transparency, 0.f, 1.f);
+    changed |= ImGui::SliderFloat("Transparency", &m_Transparency, 0.f, 1.f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Stick);
     ImGui::PopID();
     return changed;
 }
