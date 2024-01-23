@@ -524,7 +524,7 @@ ImTextureID Node::LoadNodeLogo(void * data, int size) const
     int width = 0, height = 0, component = 0;
     if (auto _data = stbi_load_from_memory((stbi_uc const *)data, size, &width, &height, &component, 4))
     {
-        logo = ImGui::ImCreateTexture(_data, width, height);
+        logo = ImGui::ImCreateTexture(_data, width, height, component);
     }
     return logo;
 }
