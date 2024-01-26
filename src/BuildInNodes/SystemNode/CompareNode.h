@@ -72,7 +72,7 @@ struct CompareNode final : Node
         return m_Name;
     }
 
-    LinkQueryResult AcceptLink(const Pin& receiver, const Pin& provider) const override
+    LinkQueryResult AcceptLink(const Pin& receiver, const Pin& provider) override
     {
         auto result = Node::AcceptLink(receiver, provider);
         if (!result)

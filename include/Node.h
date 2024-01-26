@@ -235,7 +235,7 @@ struct IMGUI_API Node
     virtual void            SetBreakPoint(bool breaken);
     virtual bool            IsSelected();
 
-    virtual LinkQueryResult AcceptLink(const Pin& receiver, const Pin& provider) const; // Checks if node accept link between these two pins. There node can filter out unsupported link types.
+    virtual LinkQueryResult AcceptLink(const Pin& receiver, const Pin& provider); // Checks if node accept link between these two pins. There node can filter out unsupported link types.
     virtual void            WasLinked(const Pin& receiver, const Pin& provider); // Notifies node that link involving one of its pins has been made.
     virtual void            WasUnlinked(const Pin& receiver, const Pin& provider); // Notifies node that link involving one of its pins has been broken.
 

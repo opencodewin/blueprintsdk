@@ -567,7 +567,7 @@ bool Node::DrawDataTypeSetting(const char * label, ImDataType& type, bool full_t
     return changed;
 }
 
-LinkQueryResult Node::AcceptLink(const Pin& receiver, const Pin& provider) const
+LinkQueryResult Node::AcceptLink(const Pin& receiver, const Pin& provider)
 {
     if (!receiver.IsMappedPin() && !provider.IsMappedPin() && receiver.m_Node == provider.m_Node)
         return { false, "Please drag pin link to other pin"};
@@ -591,6 +591,37 @@ LinkQueryResult Node::AcceptLink(const Pin& receiver, const Pin& provider) const
 
     if (provider.GetValueType() != receiver.GetValueType() && (provider.GetType() != PinType::Any && receiver.GetType() != PinType::Any))
         return { false, "Incompatible types"};
+
+    if (receiverIsFlow && providerIsFlow)
+    {
+        // Check loop for flow pin
+        auto check_loop = [](auto&& self, Node* node, ID_TYPE id)
+        {
+            auto pins = node->GetOutputPins();
+            for (auto pin : pins)
+            {
+                if (pin->GetType() != PinType::Flow)
+                    continue;
+                auto link_pin = pin->GetLink();
+                if (!link_pin)
+                    continue;
+                if (link_pin->m_Node->m_ID == id)
+                {
+                    return true;
+                }
+                if (self(self, link_pin->m_Node, id))
+                {
+                    return true;
+                }
+            }
+            return false;
+        };
+        
+        if (check_loop(check_loop, provider.m_Node, m_ID))
+        {
+            return { false, "Flow found dead loop"};
+        }
+    }
 
     return {true};
 }

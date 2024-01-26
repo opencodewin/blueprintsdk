@@ -2673,8 +2673,10 @@ void BluePrintUI::HandleCreateAction(uint32_t flag)
             ed::Suspend();
             if (ImGui::BeginTooltip())
             {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1,0 ,0 ,1));
                 ImGui::TextUnformatted("Invalid Link:"); ImGui::SameLine();
                 ImGui::Text("%s", canLinkResult.Reason().c_str());
+                ImGui::PopStyleColor();
                 ImGui::EndTooltip();
             }
             ed::Resume();
