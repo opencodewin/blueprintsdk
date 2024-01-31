@@ -1693,6 +1693,7 @@ void BluePrintUI::DrawNodes()
             //if (m_DebugOverlay) m_DebugOverlay->DrawInputPin(this, *pin);
             layout.NextRow();
         }
+
         if (CheckNodeStyle(node, NodeStyle::Simple))
         {
             auto nodeSize  = ed::GetNodeSize(node->m_ID);
@@ -1735,7 +1736,7 @@ void BluePrintUI::DrawNodes()
         }
         else
             layout.SetColumnAlignment(1.0f);
-        layout.NextColumn();
+        layout.NextColumn(false);
         // Draw column with output pins.
         for (auto& pin : node->GetOutputPins())
         {
