@@ -142,7 +142,7 @@ static void BlueprintTest_Initialize(void** handle)
             vThumbnail_Info->isReadyToUpload && 
             vThumbnail_Info->textureFileDatas)
         {
-            auto texture = ImGui::ImCreateTexture(vThumbnail_Info->textureFileDatas, vThumbnail_Info->textureWidth, vThumbnail_Info->textureHeight);
+            auto texture = ImGui::ImCreateTexture(vThumbnail_Info->textureFileDatas, vThumbnail_Info->textureWidth, vThumbnail_Info->textureHeight, vThumbnail_Info->textureChannels);
             vThumbnail_Info->textureID = (void*)texture;
             delete[] vThumbnail_Info->textureFileDatas;
             vThumbnail_Info->textureFileDatas = nullptr;
