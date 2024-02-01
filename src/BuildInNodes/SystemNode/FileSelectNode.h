@@ -83,7 +83,7 @@ struct FileSelectNode final : Node
         auto& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
             io.ConfigViewportsNoDecoration = true;
-        ImGuiFileDialogFlags vflags = ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
+        ImGuiFileDialogFlags vflags = ImGuiFileDialogFlags_DontShowHiddenFiles | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
         if (m_isShowBookmark)       vflags |= ImGuiFileDialogFlags_ShowBookmark;
         if (!m_isShowHiddenFiles)   vflags |= ImGuiFileDialogFlags_DontShowHiddenFiles;
         if (!m_bookmark.empty())    ImGuiFileDialog::Instance()->DeserializeBookmarks(m_bookmark);
