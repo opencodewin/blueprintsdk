@@ -331,7 +331,7 @@ static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
 
 static bool BlueprintTest_Frame(void * handle, bool app_will_quit)
 {
-    static const char* buttons[] = { "Quit", "Cancel", NULL };
+    static const char* buttons[] = { "Quit", "Cancel", "Save", NULL };
     static ImGui::MsgBox msgbox_event;
     msgbox_event.Init("Quit Editor?", ICON_MD_WARNING, "Current document is modified.\nAre you really sure you want to Quit?", buttons, false);
     BluePrint::BluePrintUI * UI = (BluePrint::BluePrintUI *)handle;
@@ -360,6 +360,11 @@ static bool BlueprintTest_Frame(void * handle, bool app_will_quit)
     {
         UI->Resume();
         app_done = false;
+    }
+    else if (msg_ret == 3)
+    {
+        UI->File_Save();
+        app_done = true;
     }
     return app_done;
 }
