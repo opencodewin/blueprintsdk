@@ -4081,10 +4081,18 @@ bool BluePrintUI::Blueprint_SwapNode(ID_TYPE src_id, ID_TYPE dst_id)
             }
         }
     }
+    // we need unlink all flow pin first, in case link check dead loop
+    for (auto pair : relink_pairs)
+    {
+        if (pair.first->GetType() == PinType::Flow)
+            pair.first->Unlink();
+    }
     for (auto pair : relink_pairs)
     {
         if (pair.first && pair.second)
+        {
             pair.first->LinkTo(*pair.second);
+        }
     }
 
     ed::SetNodePosition(src->m_ID, dst_pos);
