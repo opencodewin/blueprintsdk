@@ -125,12 +125,6 @@ struct FileSelectNode final : Node
         }
         ImGui::SameLine(0);
         ImGui::TextUnformatted(m_file_name.c_str());
-        auto bookmark = ImGuiFileDialog::Instance()->SerializePlaces();
-        if (m_bookmark != bookmark)
-        {
-            m_bookmark = bookmark;
-            changed = true;
-        }
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
             io.ConfigViewportsNoDecoration = false;
         return changed;
@@ -205,14 +199,6 @@ struct FileSelectNode final : Node
                 m_filters = val.get<imgui_json::string>();
             }
         }
-        if (value.contains("bookmark"))
-        {
-            auto& val = value["bookmark"];
-            if (val.is_string())
-            {
-                m_bookmark = val.get<imgui_json::string>();
-            }
-        }
         if (value.contains("show_bookmark"))
         {
             auto& val = value["show_bookmark"];
@@ -223,7 +209,6 @@ struct FileSelectNode final : Node
             auto& val = value["show_hidden"];
             if (val.is_boolean()) m_isShowHiddenFiles = val.get<imgui_json::boolean>();
         }
-        if (!m_bookmark.empty())    ImGuiFileDialog::Instance()->DeserializePlaces(m_bookmark);
         return ret;
     }
 
@@ -238,7 +223,6 @@ struct FileSelectNode final : Node
         value["show_bookmark"] = m_isShowBookmark;
         value["show_hidden"] = m_isShowHiddenFiles;
         value["filter"] = m_filters;
-        value["bookmark"] = m_bookmark;
     }
 
     void BuildOutputPin()
@@ -276,7 +260,6 @@ struct FileSelectNode final : Node
     string m_file_path;
     string m_file_name;
     string m_file_suffix;
-    string m_bookmark {""};
     bool m_isShowBookmark {false};
     bool m_isShowHiddenFiles {false};
     bool m_needReload {false};
