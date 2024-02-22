@@ -620,14 +620,14 @@ void BluePrintUI::Finalize()
     ed::DestroyEditor(m_Editor);
     m_Editor = nullptr;
     if (m_DebugOverlay) { delete m_DebugOverlay; m_DebugOverlay = nullptr; }
-#ifdef USE_BOOKMARK
+#ifdef USE_PLACES_FEATURE
 	// save bookmarks
     if (!m_BookMarkPath.empty())
     {
         std::ofstream configFileWriter(m_BookMarkPath, std::ios::out);
         if (!configFileWriter.bad())
         {
-            configFileWriter << ImGuiFileDialog::Instance()->SerializeBookmarks();
+            configFileWriter << ImGuiFileDialog::Instance()->SerializePlaces();
             configFileWriter.close();
         }
     }

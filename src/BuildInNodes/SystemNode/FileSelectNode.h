@@ -3,7 +3,6 @@
 #if IMGUI_ICONS
 #include <icons.h>
 #endif
-#define USE_BOOKMARK
 #include <ImGuiFileDialog.h>
 namespace BluePrint
 {
@@ -86,7 +85,7 @@ struct FileSelectNode final : Node
         ImGuiFileDialogFlags vflags = ImGuiFileDialogFlags_DontShowHiddenFiles | ImGuiFileDialogFlags_CaseInsensitiveExtention | ImGuiFileDialogFlags_Modal;
         if (m_isShowBookmark)       vflags |= ImGuiFileDialogFlags_ShowBookmark;
         if (!m_isShowHiddenFiles)   vflags |= ImGuiFileDialogFlags_DontShowHiddenFiles;
-        if (!m_bookmark.empty())    ImGuiFileDialog::Instance()->DeserializeBookmarks(m_bookmark);
+        if (!m_bookmark.empty())    ImGuiFileDialog::Instance()->DeserializePlaces(m_bookmark);
         if (m_Blueprint->GetStyleLight())
             ImGuiFileDialog::Instance()->SetLightStyle();
         else
@@ -127,7 +126,7 @@ struct FileSelectNode final : Node
         }
         ImGui::SameLine(0);
         ImGui::TextUnformatted(m_file_name.c_str());
-        auto bookmark = ImGuiFileDialog::Instance()->SerializeBookmarks();
+        auto bookmark = ImGuiFileDialog::Instance()->SerializePlaces();
         if (m_bookmark != bookmark)
         {
             m_bookmark = bookmark;
