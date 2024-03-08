@@ -2130,7 +2130,7 @@ void BluePrintUI::DrawInfoTooltip()
                                         hoveredNode->m_Tick);
                 std::string consuming_text = oss.str() + (hoveredNode->m_Tick > 1000000 ? "s" : hoveredNode->m_Tick > 1000 ? "ms" : "us");
                 ImGui::Bullet(); ImGui::TextUnformatted(" Consuming:"); ImGui::SameLine(); ImGui::Text("%s", consuming_text.c_str());
-                ImGui::Bullet(); ImGui::TextUnformatted(" Node Time:"); ImGui::SameLine(); ImGui::Text("%.3fms", hoveredNode->m_NodeTimeMs);
+                ImGui::Bullet(); ImGui::TextUnformatted(" Node Time:"); ImGui::SameLine(); ImGui::Text("%.3fms (avg: %.3fms)", hoveredNode->m_NodeTimeMs, hoveredNode->m_AvgTimeMs);
             }
             ImGui::EndTooltip();
         }

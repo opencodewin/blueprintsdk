@@ -92,6 +92,15 @@ StepResult Context::Step(Context * context, bool restep)
     auto end_time = ImGui::get_current_time_usec();
     entryPin->m_Node->m_Tick += end_time - start_time;
 
+    entryPin->m_Node->m_HitCount ++;
+    entryPin->m_Node->m_CountTimeMs += entryPin->m_Node->m_NodeTimeMs;
+    if (entryPin->m_Node->m_HitCount > 100)
+    {
+        entryPin->m_Node->m_HitCount = 100;
+        entryPin->m_Node->m_CountTimeMs -= entryPin->m_Node->m_AvgTimeMs;
+    }
+    entryPin->m_Node->m_AvgTimeMs = entryPin->m_Node->m_HitCount > 0 ? entryPin->m_Node->m_CountTimeMs / entryPin->m_Node->m_HitCount : 0;
+
     if (next.m_Node)
     {
         auto bp = next.m_Node->m_Blueprint;

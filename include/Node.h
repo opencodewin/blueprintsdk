@@ -279,6 +279,10 @@ struct IMGUI_API Node
     uint64_t        m_Tick {0};
     uint64_t        m_Hits {0};
     double          m_NodeTimeMs    {0.f};
+    // for avg banchmark
+    int             m_HitCount      {0};
+    double          m_CountTimeMs   {0.f};
+    double          m_AvgTimeMs     {0.f};
 };
 
 struct ClipNode
