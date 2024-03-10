@@ -1944,6 +1944,7 @@ void BluePrintUI::DrawInfoTooltip()
                                                 mat.color_format == IM_CF_RGBA ? "RGBA" :
                                                 mat.color_format == IM_CF_YUV420 ? "YUV420" :
                                                 mat.color_format == IM_CF_YUV422 ? "YUV422" :
+                                                mat.color_format == IM_CF_YUV440 ? "YUV440" :
                                                 mat.color_format == IM_CF_YUV444 ? "YUV444" :
                                                 mat.color_format == IM_CF_YUVA ? "YUVA" :
                                                 mat.color_format == IM_CF_NV12 ? "NV12" : 
