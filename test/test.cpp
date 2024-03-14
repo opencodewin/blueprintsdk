@@ -174,7 +174,7 @@ static void BlueprintTest_Finalize(void** handle)
     delete UI;
 }
 
-static bool BlueprintTest_Splash_Screen(void* handle, bool app_will_quit)
+static bool BlueprintTest_Splash_Screen(void* handle, bool& app_will_quit)
 {
     static int32_t splash_start_time = ImGui::get_current_time_msec();
     static bool UI_inited = false;
