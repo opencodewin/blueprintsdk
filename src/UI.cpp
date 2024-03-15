@@ -525,6 +525,7 @@ void BluePrintUI::LoadPlugins(const std::vector<std::string>& pluginPaths, int& 
                                                         VERSION_PATCH(nodeinfo->m_Version), 
                                                         VERSION_BUILT(nodeinfo->m_Version));
                 current_message = nodeinfo->m_Name;
+                std::cout << "Successfully load extra node:" << current_message << std::endl;
             }
         }
 
