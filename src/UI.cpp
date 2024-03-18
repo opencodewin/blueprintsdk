@@ -1876,7 +1876,6 @@ void BluePrintUI::DrawInfoTooltip()
 
         if (showNode && pin->m_Node)
         {
-            auto isDummy = pin->m_Node->GetStyle() == NodeStyle::Dummy;
             auto nodeName = !isDummy ? pin->m_Node->GetName() : ((DummyNode *)pin->m_Node)->m_name + "*load fail*";
             ImGui::Bullet(); ImGui::TextUnformatted("      "); ImGui::SameLine(); ImGui::TextUnformatted("Node:"); ImGui::SameLine();
             ImGui::Text(" %" PRI_sv, FMT_sv(nodeName));
@@ -1905,9 +1904,13 @@ void BluePrintUI::DrawInfoTooltip()
                         link = link->GetLink(bp);
                     if (link)
                     {
-                        link->m_Node->m_mutex.lock();
-                        pinValue = link->GetValue();
-                        link->m_Node->m_mutex.unlock();
+                        auto isLinkDummy = link->m_Node->GetStyle() == NodeStyle::Dummy;
+                        if (!isLinkDummy)
+                        {
+                            link->m_Node->m_mutex.lock();
+                            pinValue = link->GetValue();
+                            link->m_Node->m_mutex.unlock();
+                        }
                     }
                 }
             }
@@ -1987,9 +1990,13 @@ void BluePrintUI::DrawInfoTooltip()
                         link = link->GetLink(bp);
                     if (link)
                     {
-                        link->m_Node->m_mutex.lock();
-                        pinValue = link->GetValue();
-                        link->m_Node->m_mutex.unlock();
+                        auto isLinkDummy = link->m_Node->GetStyle() == NodeStyle::Dummy;
+                        if (!isLinkDummy)
+                        {
+                            link->m_Node->m_mutex.lock();
+                            pinValue = link->GetValue();
+                            link->m_Node->m_mutex.unlock();
+                        }
                     }
                 }
             }
@@ -2151,30 +2158,35 @@ void BluePrintUI::DrawInfoTooltip()
             auto secondPin = m_Document->m_Blueprint.FindPin(static_cast<ID_TYPE>(secondPinId.Get()));
             if (firstPin && secondPin)
             {
-                if (firstPin->GetType() == PinType::Flow && secondPin->GetType() == PinType::Flow)
+                auto isFirstDummy = firstPin->m_Node->GetStyle() == NodeStyle::Dummy;
+                auto isSecondDummy = secondPin->m_Node->GetStyle() == NodeStyle::Dummy;
+                if (!isFirstDummy && !isSecondDummy)
                 {
-                    startPin = firstPin;
-                    endPin = secondPin;
+                    if (firstPin->GetType() == PinType::Flow && secondPin->GetType() == PinType::Flow)
+                    {
+                        startPin = firstPin;
+                        endPin = secondPin;
+                    }
+                    else
+                    {
+                        startPin = secondPin;
+                        endPin = firstPin;
+                    }
+                    ed::Suspend();
+                    if (ImGui::BeginTooltip())
+                    {
+                        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.75f);
+                        ImGui::Text("Link ID: 0x%08" PRIX32, startPin->m_ID);
+                        ImGui::Text("Type: %s", PinTypeToString(startPin->GetValueType()).c_str());
+                        ImGui::Separator();
+                        pinTooltip("Start Pin:", startPin, true);
+                        ImGui::Separator();
+                        pinTooltip("End Pin:", endPin, true);
+                        ImGui::PopStyleVar();
+                        ImGui::EndTooltip();
+                    }
+                    ed::Resume();
                 }
-                else
-                {
-                    startPin = secondPin;
-                    endPin = firstPin;
-                }
-                ed::Suspend();
-                if (ImGui::BeginTooltip())
-                {
-                    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.75f);
-                    ImGui::Text("Link ID: 0x%08" PRIX32, startPin->m_ID);
-                    ImGui::Text("Type: %s", PinTypeToString(startPin->GetValueType()).c_str());
-                    ImGui::Separator();
-                    pinTooltip("Start Pin:", startPin, true);
-                    ImGui::Separator();
-                    pinTooltip("End Pin:", endPin, true);
-                    ImGui::PopStyleVar();
-                    ImGui::EndTooltip();
-                }
-                ed::Resume();
             }
         }
     }
