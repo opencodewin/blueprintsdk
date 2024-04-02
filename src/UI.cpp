@@ -3779,6 +3779,7 @@ bool BluePrintUI::Blueprint_AppendNode(ID_TYPE type_id, ID_TYPE* node_id)
         //ed::SetCurrentEditor(nullptr);
         return false;
     }
+    new_node->PreLoad();
     BeginOpRecord("AppendNode");
 
     if (node_id) *node_id = new_node->m_ID;

@@ -550,6 +550,7 @@ int BP::Load(const imgui_json::value& value)
             node->Load(nodeValue);
         }
 
+        node->PreLoad();
         m_Nodes.emplace_back(node);
     }
 

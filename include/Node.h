@@ -125,7 +125,8 @@ struct IMGUI_API Node
         m_NodeTimeMs = 0;
     }
 
-    virtual void Update() {}; // Update Node
+    virtual void Update() {}  // Update Node
+    virtual void PreLoad() {} // pre-load node resource
 
     virtual void OnPause(Context& context) {}
     virtual void OnResume(Context& context) {}
