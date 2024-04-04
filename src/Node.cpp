@@ -208,7 +208,7 @@ ID_TYPE NodeRegistry::RegisterNodeType(std::string Path)
     }
 
     m_ExternalObject.push_back(dlobject);
-    info->m_Url = ImGuiHelper::path_url(Path);
+    info->m_Url = dlobject->get_module_path();//ImGuiHelper::path_url(Path);
     return RegisterNodeType(info);
 }
 
