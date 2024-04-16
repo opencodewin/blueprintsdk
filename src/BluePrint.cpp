@@ -370,7 +370,7 @@ StepResult BP::Stop()
     return m_Context.Stop();
 }
 
-StepResult BP::Execute(Node& entryPointNode)
+StepResult BP::Execute(Node& entryPointNode, bool bypass_bg_node)
 {
     auto nodeIt = std::find(m_Nodes.begin(), m_Nodes.end(), static_cast<Node*>(&entryPointNode));
     if (nodeIt == m_Nodes.end())
@@ -384,11 +384,11 @@ StepResult BP::Execute(Node& entryPointNode)
 #if defined(__EMSCRIPTEN__)
     return m_Context.Start(*entry_pin);
 #else
-    return m_Context.Execute(*entry_pin);
+    return m_Context.Execute(*entry_pin, bypass_bg_node);
 #endif
 }
 
-StepResult BP::Run(Node& entryPointNode)
+StepResult BP::Run(Node& entryPointNode, bool bypass_bg_node)
 {
     auto nodeIt = std::find(m_Nodes.begin(), m_Nodes.end(), static_cast<Node*>(&entryPointNode));
     if (nodeIt == m_Nodes.end())
@@ -400,7 +400,7 @@ StepResult BP::Run(Node& entryPointNode)
     auto entry_pin = entryPointNode.GetOutputFlowPin();
     if (!entry_pin)
         return StepResult::Error;
-    return m_Context.Run(*entry_pin);
+    return m_Context.Run(*entry_pin, bypass_bg_node);
 }
 
 StepResult BP::Pause()

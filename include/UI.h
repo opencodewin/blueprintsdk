@@ -332,9 +332,9 @@ public:
     Node* FindExitPointNode();
 
     bool Blueprint_SetFilter(const std::string name, const PinValue& value);
-    bool Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output, int64_t current, int64_t duration);
+    bool Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output, int64_t current, int64_t duration, bool bypass_bg_node = false);
     bool Blueprint_SetTransition(const std::string name, const PinValue& value);
-    bool Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration);
+    bool Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration, bool bypass_bg_node = false);
 
     void HandleAutoLink(Node *node, vector<std::pair<Pin *, Pin *>>& relink_pairs);
     void HandleAutoLink(Node *node, Node* input_node, Node* output_node);

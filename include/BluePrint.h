@@ -135,13 +135,13 @@ struct IMGUI_API Context
 
     void ResetState();
 
-    StepResult Start(FlowPin& entryPoint);
+    StepResult Start(FlowPin& entryPoint, bool bypass_bg_node = false);
     StepResult Step(Context * context = nullptr, bool restep = false);
     StepResult Restep(Context * context = nullptr);
     StepResult StepToEnd(Node* node = nullptr);
     
-    StepResult Run(FlowPin& entryPoint);        // non-thread run, blocking mode
-    StepResult Execute(FlowPin& entryPoint);
+    StepResult Run(FlowPin& entryPoint, bool bypass_bg_node = false);        // non-thread run, blocking mode
+    StepResult Execute(FlowPin& entryPoint, bool bypass_bg_node = false);
     StepResult Pause();
     StepResult ThreadStep();
     StepResult ThreadRestep();
@@ -180,6 +180,7 @@ struct IMGUI_API Context
     bool                        m_StepToEnd {false};
     bool                        m_ThreadRunning {false};    // sub-thread is running
     bool                        m_pause_event   {false};
+    bool                        m_bypass_bg_node {false};
 
 
     std::vector<FlowPin>            m_Callstack;
@@ -334,8 +335,8 @@ struct IMGUI_API BP
             ContextMonitor* GetContextMonitor();
     const   ContextMonitor* GetContextMonitor() const;
 
-    StepResult Run(Node& entryPointNode);
-    StepResult Execute(Node& entryPointNode);
+    StepResult Run(Node& entryPointNode, bool bypass_bg_node = false);
+    StepResult Execute(Node& entryPointNode, bool bypass_bg_node = false);
     StepResult Stop();
     StepResult Pause();
     StepResult Next();

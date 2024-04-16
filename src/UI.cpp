@@ -3623,7 +3623,7 @@ bool BluePrintUI::Blueprint_SetFilter(const std::string name, const PinValue& va
     return false;
 }
 
-bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output, int64_t current, int64_t duration)
+bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output, int64_t current, int64_t duration, bool bypass_bg_node)
 {
     if (!Blueprint_IsValid())
         return false;
@@ -3637,7 +3637,7 @@ bool BluePrintUI::Blueprint_RunFilter(ImGui::ImMat& input, ImGui::ImMat& output,
     FilterEntryPointNode * entryNode = (FilterEntryPointNode *)entry_node;
     MatExitPointNode * exitNode = (MatExitPointNode *)exit_node;
     entryNode->m_MatOut.SetValue(input);
-    auto result = m_Document->m_Blueprint.Run(*entryNode);
+    auto result = m_Document->m_Blueprint.Run(*entryNode, bypass_bg_node);
     if (result == StepResult::Error)
     {
         LOGI("Execution: Failed at step %" PRIu32, m_Document->m_Blueprint.StepCount());
@@ -3668,7 +3668,7 @@ bool BluePrintUI::Blueprint_SetTransition(const std::string name, const PinValue
     return false;
 }
 
-bool BluePrintUI::Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration)
+bool BluePrintUI::Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMat& input_second, ImGui::ImMat& output, int64_t current, int64_t duration, bool bypass_bg_node)
 {
     if (!Blueprint_IsValid())
         return false;
@@ -3685,7 +3685,7 @@ bool BluePrintUI::Blueprint_RunTransition(ImGui::ImMat& input_first, ImGui::ImMa
     entryNode->m_MatOutFirst.SetValue(input_first);
     entryNode->m_MatOutSecond.SetValue(input_second);
     entryNode->m_TransitionPos.SetValue(progress);
-    auto result = m_Document->m_Blueprint.Run(*entryNode);
+    auto result = m_Document->m_Blueprint.Run(*entryNode, bypass_bg_node);
     if (result == StepResult::Error)
     {
         LOGI("Execution: Failed at step %" PRIu32, m_Document->m_Blueprint.StepCount());

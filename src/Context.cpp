@@ -27,9 +27,10 @@ void Context::ResetState()
     m_Values.clear();
 }
 
-StepResult Context::Start(FlowPin& entryPoint)
+StepResult Context::Start(FlowPin& entryPoint, bool bypass_bg_node)
 {
     m_Callstack.resize(0);
+    m_bypass_bg_node = bypass_bg_node;
     m_CurrentNode = entryPoint.m_Node;
     m_CurrentFlowPin = entryPoint;
     m_StepCount = 0;
@@ -181,11 +182,11 @@ StepResult Context::StepToEnd(Node* node)
     return result;
 }
 
-StepResult Context::Run(FlowPin& entryPoint)
+StepResult Context::Run(FlowPin& entryPoint, bool bypass_bg_node)
 {
     m_Executing = true;
     m_ThreadRunning = false;
-    Start(entryPoint);
+    Start(entryPoint, bypass_bg_node);
     auto result = StepResult::Done;
     while (true)
     {
@@ -194,6 +195,7 @@ StepResult Context::Run(FlowPin& entryPoint)
             break;
     }
     m_Executing = false;
+    m_bypass_bg_node = false;
     m_PrevNode = nullptr;
     m_CurrentNode = nullptr;
     m_PrevFlowPin = {};
@@ -202,12 +204,12 @@ StepResult Context::Run(FlowPin& entryPoint)
     return result;
 }
 
-static void RunThread(Context& context, FlowPin& entryPoint)
+static void RunThread(Context& context, FlowPin& entryPoint, bool bypass_bg_node)
 {
     ContextMonitor* monitor = context.m_Monitor;
     BluePrint::StepResult result = BluePrint::StepResult::Done;
     context.SetContextMonitor(nullptr);
-    context.Start(entryPoint);
+    context.Start(entryPoint, bypass_bg_node);
     context.m_Executing = true;
     context.m_ThreadRunning = true;
     context.m_pause_event = false;
@@ -266,6 +268,7 @@ static void RunThread(Context& context, FlowPin& entryPoint)
     context.m_StepNode = nullptr;
     context.m_PrevNode = nullptr;
     context.m_CurrentNode = nullptr;
+    context.m_bypass_bg_node = false;
     context.m_PrevFlowPin = {};
     context.m_CurrentFlowPin = {};
     context.m_Callstack.clear();
@@ -275,7 +278,7 @@ static void RunThread(Context& context, FlowPin& entryPoint)
     return;
 }
 
-StepResult Context::Execute(FlowPin& entryPoint)
+StepResult Context::Execute(FlowPin& entryPoint, bool bypass_bg_node)
 {
     StepResult result = StepResult::Done;
     if (m_Executing && m_Paused)
@@ -298,7 +301,7 @@ StepResult Context::Execute(FlowPin& entryPoint)
             m_thread = nullptr;
         }
     }
-    m_thread = new std::thread(RunThread, std::ref(*this), std::ref(entryPoint));
+    m_thread = new std::thread(RunThread, std::ref(*this), std::ref(entryPoint), bypass_bg_node);
     return result;
 }
 
