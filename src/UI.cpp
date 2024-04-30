@@ -4125,12 +4125,14 @@ bool BluePrintUI::Blueprint_DeleteNode(ID_TYPE id)
         return false;
     if (!Blueprint_IsValid())
         return false;
-    BeginOpRecord("DeleteNode");
+    auto deferredTransaction = m_Document->GetDeferredUndoTransaction("Destroy Action");
+    BeginOpRecord("DestroyAction");
     ed::SetCurrentEditor(m_Editor);
     auto result = ed::DeleteNode(id);
     if (result)
     {
         //HandleDestroyAction();
+        deferredTransaction->Begin("Delete Item");
         auto node = m_Document->m_Blueprint.FindNode(id);
         if (node && node->GetStyle() != NodeStyle::Group)
         {
