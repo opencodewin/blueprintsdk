@@ -422,6 +422,7 @@ private:
 namespace BluePrint
 {
 IMGUI_API void GetVersion(int& major, int& minor, int& patch, int& build);
+IMGUI_API ID_TYPE GetNodeTypeID(const std::string type, const std::string catalog);
 } // namespace BluePrint
 
 # define BP_NODE(type, node_version, api_version, node_type, node_style, node_catalog) \

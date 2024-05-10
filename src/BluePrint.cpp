@@ -16,6 +16,11 @@ void GetVersion(int& major, int& minor, int& patch, int& build)
     patch = IMGUI_BP_SDK_VERSION_PATCH;
     build = IMGUI_BP_SDK_VERSION_BUILD;
 }
+
+ID_TYPE GetNodeTypeID(const std::string type, const std::string catalog)
+{ 
+    return fnv1a_hash_32(type + "*" + catalog);
+}
 // -----------------------------
 // -------[ IDGenerator ]-------
 // -----------------------------
