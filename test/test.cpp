@@ -156,7 +156,7 @@ static void BlueprintTest_Initialize(void** handle)
         if (vThumbnail_Info && vThumbnail_Info->textureID)
         {
             ImTextureID texID = (ImTextureID)vThumbnail_Info->textureID;
-            ImGui::ImDestroyTexture(texID);
+            ImGui::ImDestroyTexture(&texID);
         }
     });
 #endif
